@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit selected question</title>
+
+    <!--CoreUI css (Bootstrap) and Font Awesome-->
+    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{~/src/main/resources/static/css/bootstrap.min.css}"/>
+
+    <style>
+        .myTableCell{
+            display: table-cell;
+            vertical-align: middle !important;
+            text-align: center;
+            color: rgba(0, 0, 0, 0.6);
+            width: 50px;
+        }
+        .myTableCell .fa-trash-alt {
+            cursor: pointer;
+        }
+        .fa-check{
+            color: #3a9d5d;
+        }
+        .fa-times{
+            color: firebrick;
+        }
+    </style>
+</head>
+<body class="app">
+
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index">Main</a></li>
+            <li class="breadcrumb-item"><a href="/test/all">List of all available tests</a></li>
+
+            <li class="breadcrumb-item">
+                <a th:href="@{/questions/index?testID=__${test.getTestID()}__}"
+                   title="See all questions for test">[[${test.getTestHeader()}]]</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Edit question No.[[${Question.getQuestionID()}]]</li>
+        </ol>
+    </nav>
+
+
+
+
+    <div class="app-body">
+        <main class="main">
+            <div class="container-fluid" >
+                <div class="row justify-content-center">
+                    <div class="card col-md-10" >
+                        <div class="card-body">
+
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Question id:</label>
+                                <div class="col-sm-10">
+                                    [[${Question.getQuestionID()}]]
+                                </div>
+                            </div>
+
+
+
+                            <form method="post"
+                                  id="formQHeader"
+                                  action="/questions/updateheader"
+                                  th:action="@{'/questions/updateheader?testID=' +  ${Question.getTestID()} +  '&QuestionID=' + ${Question.getQuestionID()}}"
+                                  class="needs-validation" novalidate>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Is multi choice:</label>
+                                    <div class="col-sm-10">
+                                        <i th:class="${Question.isMultiChoice()} ? 'ChangeIcon iIsMultiChoice fa fa-check' : 'ChangeIcon iIsMultiChoice fa fa-times'"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="display: none" >
+                                    <input class="col-sm-2"
+                                           id="inputIsMultichoice"
+                                           name="inputIsMultichoice" value="0" />
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Text:</label>
+                                    <div class="col-sm-10">
+                                        <textarea class="form-control"
+                                                  id="questionHeader"
+                                                  name="questionHeader"
+                                                  rows="4"
+                                                  th:inline="text"
+                                                  required>[[${Question.getQuestionText()}]]</textarea>
+                                        <div class="invalid-feedback" id="invalidHeader">
+                                            Min 10 charachters!
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Answer:</label>
+                                    <div class="col-sm-10">
+                                        <textarea class="form-control"
+                                                  rows="4"
+                                                  th:inline="text"
+                                                  id="questionAnswer"
+                                                  name="questionAnswer"
+                                                  required>[[${Question.getAnswerComment()}]]</textarea>
+                                        <div class="invalid-feedback" id="invalidAnswer">
+                                            Min 10 charachters!
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Answer options:</label>
+                                <div class="col-sm-10">
+
+                                    <table class="table table-borderless" id="tableAnswerOptions">
+                                        <thead >
+                                            <tr>
+                                                <td>Option text</td>
+                                                <td style="font-size: 10px; width: 50px;">Correct?</td>
+                                                <td width="50px"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="answer : ${Question.getTestQuestionAnswers()}" >
+                                                <td>
+                                                    <textarea class="form-control"
+                                                              required
+                                                              rows="1"
+                                                              placeholder="Put your answer option here">[[${answer.getAnswerText()}]]</textarea>
+                                                </td>
+                                                <td class="myTableCell">
+                                                    <i th:class="${answer.isCorrect()} ? 'fas fa-check ChangeIcon' : 'fas fa-times ChangeIcon'"></i>
+                                                </td>
+                                                <td class="myTableCell">
+
+                                                    <!--Открываем модальное окно для удаления ответа на вопрос-->
+                                                    <a href="#"
+                                                       data-toggle="modal"
+                                                       data-target="#divDeleteQuestion">
+                                                        <i class="far fa-trash-alt"
+                                                           title="Delete answer" style="display: none" ></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="text-right">
+                                <a class="btn btn-secondary"
+                                   th:href="@{/questions/index?testID=__${test.getTestID()}__}">Back to list</a>
+                                &nbsp
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        id="btnSave">Save</button>
+                                &nbsp
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#divDeleteQuestion">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </main>
+    </div>
+
+
+    <div id="divError"
+         class="alert alert-danger alert-dismissible fade show"
+         role="alert"
+         style="display: none">
+        <h4 class="alert-heading">Sorry, but there was an error.</h4>
+        <span id="spanError"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div id="divSuccess"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert" style="display: none">
+        <p>Saved to database!</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+
+
+
+    <!-- Modal for deleting question-->
+    <div class="modal fade" id="divDeleteQuestion" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Please confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="get"
+                          action="/questions/delete"
+                          th:action="@{'/questions/delete?testID=' + ${Question.getTestID()} +  '&QuestionID=' + ${Question.getQuestionID()}}"
+                          id="formDeleteQuestion" class="needs-validation" novalidate>
+                        <div class="form-group row">
+                            <span class="col-md-12 col-form-label">Are you sure about deleting this question?</span>
+                            <!--<label for="questionHeader" class="col-md-2 col-form-label">Text:</label>-->
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <a th:href="@{/questions/delete?testID=__${Question.getTestID()}__&QuestionID=__${Question.getQuestionID()}__}"
+                               class="btn btn-danger" >Yes, delete</a>
+                            <!--<button type="submit" class="btn btn-danger">Yes, delete</button>-->
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            // Показываем или скрываем кнопку "Удалить" в списке ответов
+            $("#tableAnswerOptions tbody tr").hover(
+                function () {
+                    $(this).find(".fa-trash-alt").show();
+                }, function () {
+                    $(this).find(".fa-trash-alt").hide();
+                });
+
+            // Меняем иконки (крестик или галочка) в списке ответов
+            $(".ChangeIcon").click(function () {
+                if ($(this).hasClass( "fa-times")){
+                    $(this).removeClass( "fa-times");
+                    $(this).addClass("fa-check");
+                } else {
+                    $(this).removeClass( "fa-check");
+                    $(this).addClass("fa-times");
+                }
+            });
+
+
+            // Пользователь поменял галочку "IsMultiChoice"
+            $('.iIsMultiChoice').click(function () {
+                if ($(this).hasClass('fa-check')){
+                    $('#inputIsMultichoice').val("1");
+                }else{
+                    $('#inputIsMultichoice').val("0");
+                }
+
+            });
+
+
+
+            // Отправляем форму на сервер
+            $('#btnSave').click(function (e) {
+                $('#formQHeader').submit(); // answer will be submitted after header!
+            });
+
+
+            /*
+            * Собственно при отправке формы на севрер надо сделать проверки
+            * и получить результат (нормально или нет)
+            * */
+            $('#formQHeader').submit(function(e){
+                e.preventDefault();
+
+                //do some verification of text
+                var formText =  $('#questionHeader').val().trim();
+                if (formText.length < 10) {
+                    $(this).find('#invalidHeader').show();
+                    return;
+                }else{
+                    $(this).find('#invalidHeader').hide();
+                }
+
+
+                formText =  $('#questionAnswer').val().trim();
+                if (formText.length < 10) {
+                    $(this).find('#invalidAnswer').show();
+                    return;
+                }else{
+                    $(this).find('#invalidAnswer').hide();
+                }
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function(data)
+                    {
+                        showMessage(false, "")
+                    },
+                    error: function(jqxhr, textStatus, errorThrown) {
+                        showMessage(true, jqxhr.responseText);
+                    }
+
+                });
+            });
+
+
+
+
+
+            /*
+            * Функция показывает сообщение об ошибке или успехе
+            * */
+            function showMessage(ShowError, txtError) {
+
+                if (ShowError === true){
+
+                    $('#spanError').text(txtError);
+                    $('#divError').fadeIn('fast');
+                    $('#divError').delay(5000).fadeOut('slow');
+                }else {
+                    $('#divSuccess').fadeIn('slow');
+                    $('#divSuccess').delay(1000).fadeOut('slow');
+                }
+
+                // Скроллим в нижнюю часть документа, чтобы пользователь видел сообщение
+                $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+            }
+
+        });
+    </script>
+
+</body>
+</html>

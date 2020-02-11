@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Questions list</title>
+
+    <!--CoreUI css (Bootstrap) and Font Awesome-->
+    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
+
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
+</head>
+<body class="app">
+
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index">Main</a></li>
+            <li class="breadcrumb-item"><a href="/test/all">List of all available tests</a></li>
+            <li class="breadcrumb-item active" aria-current="page">[[${test.getTestHeader()}]]</li>
+        </ol>
+    </nav>
+
+
+    <div class="app-body">
+        <main class="main">
+            <div class="container-fluid" >
+                <div class="row justify-content-center">
+                    <div class="card col-md-10" >
+                        <div class="card-body">
+                            <table class="table table-borderless table-hover"
+                                   id="myTableTest">
+                                <thead>
+                                    <tr>
+                                        <th>Question name</th>
+                                        <th style="width: 100px">Answers</th>
+                                        <th style="width: 120px">Multi choice</th>
+                                        <th style="width: 80px"></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr th:each="question : ${test.getQuestions()}"
+                                        style="text-align: center">
+
+                                        <td style="text-align: left">
+                                            <a th:href="@{/questions/edit?testID=__${test.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
+                                               title="Edit"
+                                               style="text-decoration: none">
+                                                [[${question.getQuestionTextSmall()}]]
+                                            </a>
+                                        </td>
+                                        <td>
+                                            [[${question.getAnswersQty()}]]
+                                        </td>
+
+                                        <td>
+                                            <i th:class="${question.isMultiChoice()} ? 'fa fa-check' : ''"></i>
+                                        </td>
+
+
+                                        <td style="vertical-align: middle">
+                                            <!--Переходим на страницу для редактирования вопроса теста-->
+                                            <div class="myRowIcons" style="display: none">
+                                                <a th:href="@{/questions/edit?testID=__${test.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
+                                                   title="Edit question"
+                                                   style="text-decoration: none">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                &nbsp;
+                                                <!--Открываем модальное окно для удаления теста-->
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#divDeleteQuestion">
+                                                    <i class="far fa-trash-alt"
+                                                       th:id="@{Q__${question.getQuestionID()}__}"
+                                                       title="Delete question" ></i>
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+
+
+                            <hr/>
+                            <div class="text-right">
+                                <!-- Открываем модальное окошко для создания нового теста -->
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        data-toggle="modal" data-target="#newQuestionConfirm">
+                                    Add new question
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </main>
+    </div>
+
+
+
+
+    <!-- Модальное окно - подтверждает создание нового вопроса-->
+    <div class="modal fade" id="newQuestionConfirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Please confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Creating a new question. Continue?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, thanks</button>
+                    <!--<button type="button" class="btn btn-primary">Yes, create a question</button>-->
+                    <a class="btn btn-primary" th:href="@{/questions/add?testID=__${test.getTestID()}__}">Yes, create a question</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно для подтверждения удаления вопроса -->
+    <div class="modal fade" id="divDeleteQuestion" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Please confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="get"
+                          id="formDeleteQuestion" class="needs-validation" novalidate>
+                        <div class="form-group row">
+                            <span class="col-md-12 col-form-label">Are you sure about deleting this question?</span>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <a th:href="@{/questions/delete?testID=__${test.getTestID()}__&QuestionID=0}"
+                               id="aDeleteLink"
+                               class="btn btn-danger" >Yes, delete</a>
+                            <span id="spanHrefSample"
+                                  hidden="hidden"
+                                  th:text="@{/questions/delete?testID=__${test.getTestID()}__&QuestionID=100500}"></span>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            // Show or hide "Edit" & "Delete" icons in table row
+            $("#myTableTest tbody tr").hover(
+                function () {
+                    $(this).find(".myRowIcons").show();
+                }, function () {
+                    $(this).find(".myRowIcons").hide();
+                });
+
+
+
+            // Create correct URL path in "Delete question" modal window
+            $(".fa-trash-alt").click(function () {
+
+                // Question ID
+                var questionID = $(this).attr("id");
+                questionID = questionID.replace("Q", "");
+
+                // Get gref template and insert QuestionID
+                var href = $('#spanHrefSample').text();
+                href = href.replace("100500", questionID);
+
+                // Set href to modal dialog link
+                $('#aDeleteLink').attr("href", href);
+
+            });
+
+
+
+        });
+
+
+    </script>
+
+</body>
+</html>

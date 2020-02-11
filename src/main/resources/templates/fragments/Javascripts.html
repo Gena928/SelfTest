@@ -1,0 +1,22 @@
+
+
+
+<!--Javascripts in the bottom of the main page-->
+<div th:fragment="appScripts">
+
+    <!-- jQuery first, then Popper.js, Bootstrap, then CoreUI  -->
+    <script th:src="@{/webjars/popper.js/1.14.3/popper.min.js}"></script>
+    <script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+
+    <script th:src="@{/webjars/bootstrap/4.4.1/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/CoreUI/coreui.min.js}"></script>
+
+    <script type="text/javascript">
+        /* Tooltips */
+        $(document).ready(function(){
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        });
+    </script>
+</div>

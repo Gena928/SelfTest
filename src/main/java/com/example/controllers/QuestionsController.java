@@ -82,8 +82,6 @@ public class QuestionsController {
     }
 
 
-
-
     /*
     * Edit - edit selected question
     * */
@@ -117,6 +115,7 @@ public class QuestionsController {
 
         return "questions/edit";
     }
+
 
     /*
      * Updateheader - update question header & answer
@@ -182,7 +181,7 @@ public class QuestionsController {
     /*
      * deleteanswer - delete answer
      * */
-    @GetMapping(value = {"deleteanswer"})
+    @PostMapping(value = {"deleteanswer"})
     public String deleteanswer(@RequestParam(required = true, defaultValue = "0", value="testID") int testID,
                                @RequestParam(required = true, defaultValue = "0", value = "QuestionID") int QuestionID,
                                @RequestParam(required = true, defaultValue = "0", value = "answerID") int answerID,

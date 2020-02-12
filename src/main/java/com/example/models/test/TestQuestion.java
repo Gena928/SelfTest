@@ -47,13 +47,23 @@ public class TestQuestion {
     /*
     * 150 символов из текста вопроса (надо для html формы)
     * */
-    public String getQuestionTextSmall(){
+    public String getQuestion150chars(){
         int len = questionText.length();
         if (len > 150)
             len  = 150;
-
         return questionText.substring(0, len);
     }
+
+    /*
+    * 50 символов из теста вопроса (надо для html формы)
+    * */
+    public String getQuestion50chars(){
+        int len = questionText.length();
+        if (len > 50)
+            len  = 50;
+        return questionText.substring(0, len);
+    }
+
 
     public String getAnswerComment() {
         return answerComment;

@@ -729,6 +729,7 @@ public class XMLTestStorage implements ITestStorage {
         return doc;
     }
 
+
     /*
     * Сохраняем документ обратно на диск
     * */
@@ -917,9 +918,5 @@ public class XMLTestStorage implements ITestStorage {
 
 
     //</editor-fold>
-
-
-
-
 
 }

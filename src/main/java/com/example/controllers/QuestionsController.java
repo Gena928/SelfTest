@@ -83,6 +83,29 @@ public class QuestionsController {
 
 
     /*
+     * AddAnswer - adding answer to test
+     * */
+    @PostMapping(value = {"addanswer"})
+    public String addanswer(@RequestParam(required = true, defaultValue = "0", value="testID") int testID,
+                      @RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
+                      String inputAnswerText, String inputIsCorrect,
+                      HttpSession session,
+                      RedirectAttributes redirectAttributes){
+
+        // Верный или нет ответ на вопрос
+        boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
+
+        // Создаем
+        if (!myTestModel.createAnswer(questionID, inputAnswerText, isCorrect)){
+            session.setAttribute("errorMessage" , myTestModel.getErrorMessage());
+            return "redirect:error";
+        }
+
+        return "redirect:edit?testID=" + testID + "&QuestionID=" + questionID;
+    }
+
+
+    /*
     * Edit - edit selected question
     * */
     @GetMapping(value = {"edit"})
@@ -196,21 +219,4 @@ public class QuestionsController {
 
         return "redirect:edit?testID=" + testID + "&QuestionID=" + QuestionID;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -26,6 +26,9 @@
         .fa-times{
             color: firebrick;
         }
+        #trNoHover:hover {
+            background-color: white !important;
+        }
     </style>
 </head>
 <body class="app">
@@ -121,10 +124,10 @@
                                 <label class="col-sm-2 col-form-label">Answer options:</label>
                                 <div class="col-sm-10">
 
-                                    <table class="table table-borderless" id="tableAnswerOptions">
+                                    <table class="table table-borderless table-hover" id="tableAnswerOptions">
                                         <thead >
                                             <tr>
-                                                <td>Option text</td>
+                                                <td style="font-size: 10px; text-align: center">Option text</td>
                                                 <td style="font-size: 10px; width: 50px;">Correct?</td>
                                                 <td width="50px"></td>
                                             </tr>
@@ -132,13 +135,10 @@
                                         <tbody>
                                             <tr th:each="answer : ${Question.getTestQuestionAnswers()}" >
                                                 <td>
-                                                    <textarea class="form-control"
-                                                              required
-                                                              rows="1"
-                                                              placeholder="Put your answer option here">[[${answer.getAnswerText()}]]</textarea>
+                                                    <span>[[${answer.getAnswerText()}]]</span>
                                                 </td>
                                                 <td class="myTableCell">
-                                                    <i th:class="${answer.isCorrect()} ? 'fas fa-check ChangeIcon' : 'fas fa-times ChangeIcon'"></i>
+                                                    <i th:class="${answer.isCorrect()} ? 'fas fa-check' : 'fas fa-times'"></i>
                                                 </td>
                                                 <td class="myTableCell">
 
@@ -153,6 +153,46 @@
                                                 </td>
                                             </tr>
 
+
+                                            <!--Разделитель между уже добавленными ответами и новым-->
+                                            <tr style="line-height: 5px">
+                                                <td colspan="3" style="line-height: 2px; padding: 1px">
+                                                    <hr style="margin: 0"/>
+                                                </td>
+                                            </tr>
+
+
+                                            <!--Добавляем новый ответ на вопрос-->
+                                            <tr id="trNoHover">
+                                                <td>
+                                                    <form method="post"
+                                                            th:action="@{/questions/addanswer?testID=__${Question.getTestID()}__&questionID=__${Question.getQuestionID()}__}"
+                                                          id="formNewAnswer" >
+                                                        <textarea class="form-control"
+                                                                  required
+                                                                  rows="1"
+                                                                  id="inputAnswerText" name="inputAnswerText"
+                                                                  placeholder="Add a new answer here"></textarea>
+                                                        <div class="invalid-feedback" id="invalidNewAnswer">
+                                                            Min 5 charachters!
+                                                        </div>
+                                                        <input type="text"
+                                                               style="display: none"
+                                                               id="inputIsCorrect" name="inputIsCorrect"
+                                                               value="1" />
+                                                    </form>
+
+                                                </td>
+                                                <td class="myTableCell">
+                                                    <i class="fas fa-check ChangeIcon"></i>
+                                                </td>
+                                                <td class="myTableCell">
+                                                    <a href="#" id="aCreateNewAnswer" >
+                                                        <i class="fa fa-plus"
+                                                           title="Add this answer to question"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
 
@@ -161,6 +201,7 @@
                             </div>
 
 
+                            <!--Кнопка сохранения & отмены-->
                             <div class="text-right">
                                 <a class="btn btn-secondary"
                                    th:href="@{/questions/index?testID=__${test.getTestID()}__}">Back to list</a>
@@ -383,6 +424,30 @@
             });
 
 
+            // Пользователь кликнул на галочку в строке "Добавить вопрос"
+            // Надо сохранить значение (правильно или нет) в input чтобы потом нормально передалось с формой на сервер
+            $('#aCreateNewAnswer').click(function () {
+
+                var HasClass = $(this).parent().parent().find('.fas').hasClass("fa-check");
+                if (HasClass == true){
+                    $('#inputIsCorrect').val("1");
+                }
+                else {
+                    $('#inputIsCorrect').val("0");
+                }
+
+                // Проверка количества символов в ответе (мин 5)
+                var formText =  $('#inputAnswerText').val().trim();
+                if (formText.length < 5) {
+                    $('#invalidNewAnswer').show();
+                    return;
+                }
+
+
+
+                // Отправляем форму на сервер
+                $('#formNewAnswer').submit();
+            });
 
 
 

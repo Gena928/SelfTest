@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home page</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
+</head>
+<body class="app">
+
+<!--Main navbar-->
+<div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+<!--Breadcrumbs-->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/index">Main</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Start testing</li>
+    </ol>
+</nav>
+
+<!--Body-->
+<div class="app-body">
+    <main class="main">
+        <div class="container-fluid" >
+            <div class="row justify-content-center">
+                <div class="card col-md-10" >
+                    <div class="card-body">
+                        <h2>Choose questions</h2>
+                        <p>Select a questions before you start your test</p>
+
+
+                        <form method="post"
+                              id="formHeader"
+                              action="/createTest"
+                              class="needs-validation" novalidate>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Please enter header:</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control"
+                                                  id="txtHeader"
+                                                  name="txtHeader"
+                                                  rows="1"
+                                                  th:inline="text" minlength="10"
+                                                placeholder="Min 10 characters"
+                                                  required></textarea>
+                                    <div class="invalid-feedback" id="invalidHeader">
+                                        Min 10 charachters!
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" >
+                                <input class="col-sm-12" type="text" id="txtQuestionsList" name="txtQuestionsList" />
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Please select questions:</label>
+                                <div class="col-sm-10" style="padding-top: 7px;">
+
+                                    <div th:each="test : ${modelTests}">
+                                        <!--Название теста (ссылочка)-->
+                                        <p >
+                                            <a data-toggle="collapse" th:href="@{'#HeaderNo' + ${test.getTestID()}}"
+                                               aria-expanded="false" th:aria-controls="@{'HeaderNo' + ${test.getTestID()}}"
+                                            > &nbsp;[[${test.getTestHeader()}]]</a>
+                                        </p>
+
+                                        <!--Контейнер со списком вопросов-->
+                                        <div class="collapse" th:id="@{'HeaderNo' + ${test.getTestID()}}" >
+                                            <div class="card card-body">
+
+                                                <!--Выбрать все вопросы-->
+                                                <div class="form-check">
+                                                    <input class="form-check-input myAll" type="checkbox" value="" th:id="@{'SelectAll' + ${test.getTestID()}}">
+                                                    <label class="form-check-label" th:for="@{'SelectAll' + ${test.getTestID()}}">
+                                                        All
+                                                    </label>
+                                                </div>
+
+                                                <!--Список отдельных вопросов-->
+                                                <div th:each="question : ${test.getQuestions()}" class="form-check">
+                                                    <input class="form-check-input myCheckbox"
+                                                           type="checkbox"
+                                                           th:attr="data-qid=${question.getQuestionID()}, data-tid=${question.getTestID()}"
+
+                                                           value="" th:id="@{'question' + ${question.getQuestionID()}}">
+                                                    <label class="form-check-label" th:for="@{'question' + ${question.getQuestionID()}}">
+                                                        [[${question.getQuestion50chars()}]]
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="float-right" >
+
+                                    <a class="btn btn-secondary" href="index" title="Back to main page">Cancel</a>
+                                    &nbsp;
+                                    <button type="submit" class="btn btn-primary" title="Create a new test and start testing process...">Create test</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+
+<!--Footer-->
+<div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+<!--Javascripts-->
+<div th:replace="fragments/Javascripts :: appScripts"/>
+
+<div id="divError"
+     class="alert alert-danger alert-dismissible fade show"
+     role="alert"
+     style="display: none">
+    <span id="spanError"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+        // Пользователь хочет выбрать все вопросы в тесте
+        $('.myAll').click(function () {
+            var checkboxes = $(this).parent().parent().find(':checkbox');
+            checkboxes.prop('checked', $(this).is(':checked'));
+        });
+
+
+        // Отправляем форму на сервер
+        $('#formHeader').submit(function () {
+
+            // Количество символов в заголовке
+            var testHeader = $('#txtHeader').val();
+            if (testHeader.length < 10){
+                $('#invalidHeader').show();
+                return false;
+            } else {
+                $('#invalidHeader').hide();
+            }
+
+            // Бежим по каждому чекбоксу и пишем ID теста и вопроса в специальное поле
+            var qty = 0;
+            var inputText = "";
+            $('.myCheckbox:checkbox:checked').each(function () {
+
+
+                if ($(this).data('qid') && $(this).data('tid')){
+                    var testID = $(this).data('tid');
+                    var questionID = $(this).data('qid');
+                    inputText = inputText + testID + ',' +  questionID + ';';
+                    qty+= 1;
+                }
+            });
+
+            // Если ничего не выбрано!
+            if(qty == 0)
+                return showMessage('Please select questions for your test!');
+            else
+                $('#txtQuestionsList').val(inputText);
+
+
+            return false;
+        });
+
+
+
+
+        /*
+        * Функция показывает сообщение об ошибке или успехе
+        * */
+        function showMessage(txtError) {
+
+            $('#spanError').text(txtError);
+            $('#divError').fadeIn('fast');
+            $('#divError').delay(4000).fadeOut('slow');
+
+            // Скроллим в нижнюю часть документа, чтобы пользователь видел сообщение
+            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+
+            return false;
+        }
+
+
+    });
+</script>
+
+
+</body>
+</html>

@@ -902,7 +902,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Преобразуем байты (100 117 109 109 121) в нормальную строку
+    * Преобразуем массив символов (100 117 109 109 121) в нормальную строку
     * */
     private String BytesToString(String inputBytes) throws UnsupportedEncodingException{
 

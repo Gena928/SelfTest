@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import com.example.models.history.HistoryModel;
 import com.example.models.test.TestModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,13 +14,24 @@ import javax.servlet.http.HttpSession;
 public class IndexController {
 
     TestModel myTestModel = new TestModel();
+    HistoryModel myHistoryModel = new HistoryModel();
 
 
     /*
     * Главная страничка
     * */
     @GetMapping(value={"/", "index", "main", "hello"})
-    public String Welcome(){
+    public String Welcome(HttpSession session, Model model){
+
+        // Получаем историю из базы
+        if (!myHistoryModel.GetHistoryFromStorage()){
+            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            return "redirect:error";
+        }
+
+        // Добавляем историю работы в модель
+        model.addAttribute("historyHeaders", myHistoryModel.getAllTests());
+
         return "index";
     }
 
@@ -51,16 +63,13 @@ public class IndexController {
                                  String txtHeader,
                                  String txtQuestionsList){
 
+        // Сохраняем список в базе
+        if (myHistoryModel.SaveTestToHistory(txtHeader, txtQuestionsList)== -1){
+            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            return "redirect:error";
+        }
 
-
-
-
-        return "index";
+        return "redirect:index";
     }
-
-
-
-
-
 
 }

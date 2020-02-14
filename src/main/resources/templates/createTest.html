@@ -52,7 +52,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group row" >
+                            <div class="form-group row" style="display: none" >
                                 <input class="col-sm-12" type="text" id="txtQuestionsList" name="txtQuestionsList" />
                             </div>
 
@@ -133,18 +133,23 @@
 </div>
 
 
+
+
 <script type="text/javascript">
     $(document).ready(function () {
 
-
-        // Пользователь хочет выбрать все вопросы в тесте
+        /*
+        * Пользователь хочет выбрать все вопросы в тесте
+        * */
         $('.myAll').click(function () {
             var checkboxes = $(this).parent().parent().find(':checkbox');
             checkboxes.prop('checked', $(this).is(':checked'));
         });
 
 
-        // Отправляем форму на сервер
+        /*
+        * Отправляем форму на сервер
+        * */
         $('#formHeader').submit(function () {
 
             // Количество символов в заголовке
@@ -177,10 +182,8 @@
                 $('#txtQuestionsList').val(inputText);
 
 
-            return false;
+            // return false;
         });
-
-
 
 
         /*
@@ -197,8 +200,6 @@
 
             return false;
         }
-
-
     });
 </script>
 

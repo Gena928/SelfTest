@@ -6,11 +6,17 @@ package com.example.models.history;
 public class HistoryRow {
     private int headerID;
     private int questionID;
+    private int testID;
     private boolean questionAnswered;
     private boolean answerResult;
 
+
+    /*
+    * Конструктор (значения по умолчанию)
+    * */
     public HistoryRow(){
         this.answerResult = false;
+        this.questionAnswered = false;
     }
 
 
@@ -29,6 +35,10 @@ public class HistoryRow {
     public void setQuestionID(int questionID) {
         this.questionID = questionID;
     }
+
+    public int getTestID() {return testID;}
+
+    public void setTestID(int testID) {this.testID = testID;}
 
     public boolean isQuestionAnswered() {
         return questionAnswered;

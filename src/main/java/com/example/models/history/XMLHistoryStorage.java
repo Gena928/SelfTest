@@ -2,6 +2,8 @@ package com.example.models.history;
 
 
 import com.example.models.test.Test;
+import com.example.models.test.TestQuestion;
+import com.example.models.test.XMLTestStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,11 +18,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
 
@@ -162,7 +166,8 @@ public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
 
 
     /*
-     * Заполняем список данными из таблицы истории
+     * Получаем список (история тестирования) из XML в классы
+     * Метод заполняет переменную allTests
      * */
     @Override
     public boolean GetHistoryFromStorage(){
@@ -250,6 +255,139 @@ public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
     }
 
 
+    /*
+    * Чистим результаты теста в истории (подготовка перед самым началом тестирования)
+    * */
+    @Override
+    public boolean ClearTestReslts(int historyHeaderID){
+
+        // Зачистка сообщения об ошибке
+        errorMessage = "";
+
+        try {
+            Document doc = getXMLDocument(historyFileName);
+
+            // Бежим по каждому тесту в истории
+            NodeList nodeList = doc.getElementsByTagName("Header");
+            for (int i = 0; i<nodeList.getLength(); i++){
+
+                // Текущий XML узел
+                Node xmlHeaderNode = nodeList.item(i);
+
+                // ID заголовка
+                int id = Integer.parseInt(xmlHeaderNode
+                        .getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue());
+
+                // Если это НЕ нужный элемент, то ищем дальше
+                if (id != historyHeaderID)
+                    continue;
+
+                // В противном случае чистим результаты
+                NodeList xmlQuestions = ((Element)xmlHeaderNode).getElementsByTagName("row");
+                for (int q = 0; q<xmlQuestions.getLength(); q++) {
+
+                    Node xmlCurrentQuestion = xmlQuestions.item(q);
+
+                    // Макер что уже отвечен
+                    Node questionAnswered = xmlCurrentQuestion.getAttributes().getNamedItem("questionAnswered");
+                    questionAnswered.setTextContent("false");
+
+                    // Маркер что отвечен правильно
+                    Node answerResult = xmlCurrentQuestion.getAttributes().getNamedItem("answerResult");
+                    answerResult.setTextContent("false");
+                }
+            }
+
+            // Сохраняем документ
+            saveXMLDocument(historyFileName, doc);
+
+        }
+        catch (Exception e){
+            errorMessage = "Can't read XML file from disk: " + e.getMessage();
+            return false;
+        }
+        return true;
+    }
+
+    /*
+    * Получаем следующий вопрос для тестирования
+    * */
+    @Override
+    public HistoryRow GetNextQuestionForTesting(int historyHeaderiD){
+
+        // Для возврата результата
+        HistoryRow result = null;
+
+        // Экземпляр истории из базы
+        HistoryHeader historyHeader = null;
+
+
+        // Получаем всю историю
+        if (GetHistoryFromStorage() == false)
+            return null;
+
+        // Ищем именно нужный заголовок
+        for (int i = 0; i<allTests.size(); i++){
+            if (allTests.get(i).getHeaderID() == historyHeaderiD)
+                historyHeader = allTests.get(i);
+        }
+        if (historyHeader == null) {
+            errorMessage = "History records were not found in database";
+        }
+
+        // Получаем список вопросов из базы
+        XMLTestStorage testStorage = new XMLTestStorage();
+        if (testStorage.getTestsFromStorage() == false) {
+            errorMessage = testStorage.getErrorMessage();
+            return null;
+        }
+
+        // Бежим по каждой строке в истории
+        for (int histRowID = 0; histRowID < historyHeader.getHistoryRows().size(); histRowID ++){
+            HistoryRow currentRow = historyHeader.getHistoryRows().get(histRowID);
+
+            // Бежим по каждому тесту в базе
+            for (int testID = 0; testID < testStorage.getAllTests().size(); testID ++){
+                Test test = testStorage.getAllTests().get(testID);
+
+                // И внутри теста по каждому вопросу
+                for (int questionID = 0; questionID<test.getQuestions().size(); questionID ++){
+                    TestQuestion question = test.getQuestions().get(questionID);
+                    if (question.getQuestionID() == currentRow.getQuestionID()){
+                        currentRow.setQuestion(question);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /*
+        * По идее теперь к каждому вопросу в истории должен быть "приделан" реальный вопрос
+        * с текстом и вариантами ответов
+        * */
+
+        // Ищем не отвеченные вопросы и передаем следующий
+        ArrayList<HistoryRow> historyRows = new ArrayList<>();
+        for (int i = 0; i< historyHeader.getHistoryRows().size(); i++){
+            HistoryRow row = historyHeader.getHistoryRows().get(i);
+            if (row.isQuestionAnswered() == false)
+                historyRows.add(row);
+        }
+
+        // Если не отвеченных вопросов не осталось, то возвращаем строку с id заголовка = -100
+        if (historyRows.size() == 0){
+            result.setHeaderID(-100);
+            return result;
+        }
+
+        // Случайный вопрос
+        Random random = new Random();
+        result = historyRows.get(random.nextInt(historyRows.size()));
+
+        return result;
+    }
 
 
     //<editor-fold desc="Локальные методы">

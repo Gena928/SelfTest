@@ -262,9 +262,6 @@ public class XMLTestStorage implements ITestStorage {
             // Сохраняем документ
             saveXMLDocument(testFileName, doc);
 
-
-
-
         }catch (Exception e){
             errorMessage = "Can't remove node from XML document: " + e.getMessage();
             return false;

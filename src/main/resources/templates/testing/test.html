@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home page</title>
+    <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
+</head>
+<body class="app">
+
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+    <!--Breadcrumbs-->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Main page</li>
+        </ol>
+    </nav>
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+    
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+        });
+    </script>
+
+</body>
+</html>

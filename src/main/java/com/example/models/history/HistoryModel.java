@@ -8,6 +8,7 @@ public class HistoryModel {
 
     private IHistoryStorage iHistoryStorage;
 
+
     /*
     * Конструктор
     * */
@@ -15,6 +16,7 @@ public class HistoryModel {
         // Инициализация с помощью одного из хранилищ
         this.iHistoryStorage = new XMLHistoryStorage();
     }
+
 
     /*
     * Возвращаем сообщение об ошибке
@@ -30,6 +32,7 @@ public class HistoryModel {
     public ArrayList<HistoryHeader> getAllTests() {
         return iHistoryStorage.getAllTests();
     }
+
 
     /*
     * Создаем новый список для тестирования из уже существующих тестов
@@ -47,4 +50,18 @@ public class HistoryModel {
     public boolean GetHistoryFromStorage(){return iHistoryStorage.GetHistoryFromStorage();}
 
 
+    /*
+    * Чистим результаты тестирования в XML файле
+    * */
+    public boolean ClearTestReslts(int historyHeaderID){
+        return iHistoryStorage.ClearTestReslts(historyHeaderID);
+    }
+
+
+    /*
+    * Получаем следующий вопрос для тестирования
+    * */
+    public HistoryRow GetNextQuestionForTesting(int historyHeaderiD){
+        return iHistoryStorage.GetNextQuestionForTesting(historyHeaderiD);
+    }
 }

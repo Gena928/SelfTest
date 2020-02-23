@@ -1,6 +1,13 @@
 
 
 
+    <!--CSS styles-->
+    <html th:fragment="CssStyles">
+        <link rel="stylesheet" th:href="@{../css/CoreUI/CoreUI.min.css}">
+        <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
+    </html>
+
+
     <!--Header on the main page-->
     <header class="app-header navbar" th:fragment="appHeader">
         <ul class="nav">

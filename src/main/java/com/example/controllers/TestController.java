@@ -13,6 +13,11 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+
+/*
+* All things about creating, deleting and updating test
+* testing process is not here, it's in "testing" controller
+* */
 @Controller
 @RequestMapping("/test")
 public class TestController {
@@ -34,7 +39,6 @@ public class TestController {
 
         // Сортировка перед выдачей
         myTestModel.getAllTests().sort(Comparator.comparing(Test::getSortField));
-
 
         model.addAttribute("tests", myTestModel.getAllTests());
         Boolean listHasValues = (myTestModel.getAllTests().size() > 0) ? true : false;

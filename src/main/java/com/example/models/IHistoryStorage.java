@@ -1,6 +1,7 @@
 package com.example.models;
 
 import com.example.models.history.HistoryHeader;
+import com.example.models.history.HistoryRow;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,7 @@ public interface IHistoryStorage {
     // Получаем список истории
     void setAllTests(ArrayList<HistoryHeader> allTests);
 
+
     /*
     * Сохраняем новый тест в XML таблицу
     *
@@ -30,4 +32,18 @@ public interface IHistoryStorage {
     * Заполняем список данными из таблицы истории
     * */
     boolean GetHistoryFromStorage();
+
+
+    /*
+    * Удаляем результаты теста в истории (подготовка перед самым началом процесса тестирования)
+    * */
+    boolean ClearTestReslts(int historyHeaderID);
+
+
+    /*
+    * Получаем следующий вопрос для тестирования из базы
+    * */
+    HistoryRow GetNextQuestionForTesting (int historyHeaderID);
+
+
 }

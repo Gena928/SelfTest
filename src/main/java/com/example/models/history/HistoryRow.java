@@ -1,5 +1,7 @@
 package com.example.models.history;
 
+import com.example.models.test.TestQuestion;
+
 /*
 * Одна строка с ответом в базе данных
 * */
@@ -9,6 +11,7 @@ public class HistoryRow {
     private int testID;
     private boolean questionAnswered;
     private boolean answerResult;
+    private TestQuestion question;
 
 
     /*
@@ -55,4 +58,8 @@ public class HistoryRow {
     public void setAnswerResult(boolean answerResult) {
         this.answerResult = answerResult;
     }
+
+    public TestQuestion getQuestion() {return question;}
+
+    public void setQuestion(TestQuestion question) {this.question = question; }
 }

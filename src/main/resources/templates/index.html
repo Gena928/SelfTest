@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Home page</title>
-
-    <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui/dist/css/coreui.min.css">
-    <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
+    <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
 </head>
 <body class="app">
 
@@ -26,7 +24,56 @@
                 <div class="row justify-content-center">
                     <div class="card col-md-10" >
                         <div class="card-body">
-                            <span>Some charts must go here!</span>
+
+                            <table class="table table-borderless" id="tableHistoryRows">
+                                <thead>
+                                    <td style="width: 50px">id</td>
+                                    <td style="text-align: center">Name</td>
+                                    <td style="width: 80px"></td>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="historyHeader : ${historyHeaders}">
+                                        <td>
+                                            [[${historyHeader.getHeaderID()}]]
+                                        </td>
+
+                                        <td>
+
+                                            <div class="progress-group">
+                                                <div class="progress-group-header align-items-end">
+                                                    <i class="cui-globe progress-group-icon"></i>
+                                                    <div>[[${historyHeader.getHeaderText()}]]</div>
+                                                    <div class="ml-auto font-weight-bold mr-2">191.235</div>
+                                                    <div class="text-muted small">(56%)</div>
+                                                </div>
+                                                <div class="progress-group-bars">
+                                                    <div class="progress progress-xs">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <a th:href="@{testing/clearresults?id=__${historyHeader.getHeaderID()}__}"
+                                               title="Retake the test"
+                                               style="display:none; text-decoration: none"
+                                               class="aHidden">
+                                                <i class="fa fa-redo"></i>
+                                            </a>
+
+                                            &nbsp;<a href="#"
+                                                     style="display: none; text-decoration: none"
+                                                     title="Delete this history record"
+                                                     class="aHidden">
+                                                <i class="fa fa-trash" ></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
                         </div>
 
                     </div>
@@ -43,6 +90,22 @@
 
     <!--Javascripts-->
     <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            // Показываем или скрываем иконки "Удалить" в списке ответов
+            $("#tableHistoryRows tbody tr").hover(
+                function () {
+                    $(this).find(".aHidden").show();
+                }, function () {
+                    $(this).find(".aHidden").hide();
+                });
+        });
+    </script>
 
 </body>
 </html>

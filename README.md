@@ -1,6 +1,6 @@
 # SelfTest
 A simple JAVA application for self testing. 
-No database required (XML based)
+No database required (XML based).
 
 
 Application features:
@@ -8,9 +8,10 @@ Application features:
 - orginize questions into groups (tests);
 - test yourself and get scores;
 
+
 Short description
-"test" package contains code, related to creating a questions;
-"history" package contains code, related to testing process - i.e. when you choose a questions for testing and do testing itself.
+- "test" package contains code, related to creating a questions;
+- "history" package contains code, related to testing process - i.e. when you choose a questions for testing and do testing itself.
 
 
 

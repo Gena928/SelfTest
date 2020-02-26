@@ -11,7 +11,7 @@ public class HistoryRow {
     private int testID;
     private boolean questionAnswered;
     private boolean answerResult;
-    private TestQuestion question;
+    private TestQuestion question;      // Реальный экземпляр вопроса (с текстом) для этой строки истории
 
 
     /*
@@ -21,7 +21,6 @@ public class HistoryRow {
         this.answerResult = false;
         this.questionAnswered = false;
     }
-
 
     public int getHeaderID() {
         return headerID;

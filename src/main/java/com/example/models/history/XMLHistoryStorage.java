@@ -311,18 +311,16 @@ public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
         return true;
     }
 
+
     /*
-    * Получаем следующий вопрос для тестирования
+    * Получаем вопрос для тестирования
     * */
     @Override
-    public HistoryRow GetNextQuestionForTesting(int historyHeaderiD){
-
-        // Для возврата результата
-        HistoryRow result = null;
+    public HistoryHeader GetHeaderByID(int historyHeaderID){
+        errorMessage = "";
 
         // Экземпляр истории из базы
         HistoryHeader historyHeader = null;
-
 
         // Получаем всю историю
         if (GetHistoryFromStorage() == false)
@@ -330,12 +328,32 @@ public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
 
         // Ищем именно нужный заголовок
         for (int i = 0; i<allTests.size(); i++){
-            if (allTests.get(i).getHeaderID() == historyHeaderiD)
+            if (allTests.get(i).getHeaderID() == historyHeaderID)
                 historyHeader = allTests.get(i);
         }
         if (historyHeader == null) {
             errorMessage = "History records were not found in database";
+            return null;
         }
+
+        return historyHeader;
+    }
+
+
+    /*
+     * Получаем следующий вопрос для тестирования из базы
+     * к каждой строке истории будет "приделан" реальный вопрос, чтобы можно было взять текст
+     * */
+    @Override
+    public HistoryHeader GetHeaderWithQuestionsText(int historyHeaderID){
+
+        // Переменные
+        errorMessage = "";
+
+        // Экземпляр истории из базы
+        HistoryHeader historyHeader = GetHeaderByID(historyHeaderID);
+        if (historyHeader == null)
+            return null;
 
         // Получаем список вопросов из базы
         XMLTestStorage testStorage = new XMLTestStorage();
@@ -363,32 +381,124 @@ public class XMLHistoryStorage implements com.example.models.IHistoryStorage {
             }
         }
 
-        /*
-        * По идее теперь к каждому вопросу в истории должен быть "приделан" реальный вопрос
-        * с текстом и вариантами ответов
-        * */
-
-        // Ищем не отвеченные вопросы и передаем следующий
-        ArrayList<HistoryRow> historyRows = new ArrayList<>();
-        for (int i = 0; i< historyHeader.getHistoryRows().size(); i++){
-            HistoryRow row = historyHeader.getHistoryRows().get(i);
-            if (row.isQuestionAnswered() == false)
-                historyRows.add(row);
-        }
-
-        // Если не отвеченных вопросов не осталось, то возвращаем строку с id заголовка = -100
-        if (historyRows.size() == 0){
-            result.setHeaderID(-100);
-            return result;
-        }
-
-        // Случайный вопрос
-        Random random = new Random();
-        result = historyRows.get(random.nextInt(historyRows.size()));
-
-        return result;
+        return historyHeader;
     }
 
+
+    /*
+    * Ставим ответ в базе
+    * */
+    @Override
+    public boolean MakeRowAnswered(boolean answerResult, int headerID, int testID, int questionID){
+
+        // Зачистка сообщения об ошибке
+        errorMessage = "";
+
+        try {
+            Document doc = getXMLDocument(historyFileName);
+
+            // Бежим по каждому тесту в истории
+            NodeList nodeList = doc.getElementsByTagName("Header");
+            for (int i = 0; i<nodeList.getLength(); i++){
+
+                // Текущий XML узел
+                Node xmlHeaderNode = nodeList.item(i);
+
+                // ID заголовка
+                int id = Integer.parseInt(xmlHeaderNode
+                        .getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue());
+
+                // Если это НЕ нужный элемент, то ищем дальше
+                if (id != headerID)
+                    continue;
+
+                // В противном случае бежим по каждой строке
+                NodeList xmlQuestions = ((Element)xmlHeaderNode).getElementsByTagName("row");
+                for (int q = 0; q<xmlQuestions.getLength(); q++) {
+
+                    Node xmlCurrentRow = xmlQuestions.item(q);
+
+                    int tID = Integer.parseInt(
+                            xmlCurrentRow
+                                    .getAttributes()
+                                    .getNamedItem("testID")
+                                    .getNodeValue()
+                    );
+
+                    int qID = Integer.parseInt(
+                            xmlCurrentRow
+                            .getAttributes()
+                            .getNamedItem("questionID")
+                            .getNodeValue()
+                    );
+
+                    if (qID == questionID && tID == testID){
+
+                        // Макер что уже отвечен
+                        Node questionAnswered = xmlCurrentRow.getAttributes().getNamedItem("questionAnswered");
+                        questionAnswered.setTextContent("true");
+
+                        // Маркер КАК отвечен
+                        Node aResult = xmlCurrentRow.getAttributes().getNamedItem("answerResult");
+                        aResult.setTextContent(String.valueOf(answerResult));
+                    }
+                }
+            }
+
+            // Сохраняем документ
+            saveXMLDocument(historyFileName, doc);
+
+        }
+        catch (Exception e){
+            errorMessage = "Can't read XML file from disk: " + e.getMessage();
+            return false;
+        }
+        return true;
+    }
+
+
+    /*
+    * Удаляем заголовок теста из базы
+    * */
+    @Override
+    public boolean DeleteHistoryHeader(int headerID){
+
+        // Зачистка переменных
+        errorMessage = "";
+        allTests = new ArrayList<>();
+
+        try {
+            Document doc = getXMLDocument(historyFileName);
+
+            // Бежим по каждому тесту в истории
+            NodeList nodeList = doc.getElementsByTagName("Header");
+            for (int i = 0; i<nodeList.getLength(); i++){
+
+                // Текущий XML узел и экземпляр заголовка
+                Node xmlHeaderNode = nodeList.item(i);
+
+                // Параметры заголовка
+                int id = Integer.parseInt(xmlHeaderNode
+                        .getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue());
+
+                if (id == headerID)
+                    xmlHeaderNode.getParentNode().removeChild(xmlHeaderNode);
+
+            }
+
+            // Сохраняем документ
+            saveXMLDocument(historyFileName, doc);
+        }
+        catch (Exception e){
+            errorMessage = "Can't read XML file from disk: " + e.getMessage();
+            return false;
+        }
+        return true;
+    }
 
     //<editor-fold desc="Локальные методы">
     /*

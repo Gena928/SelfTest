@@ -2,7 +2,6 @@ package com.example.models.test;
 
 import com.example.models.ITestStorage;
 
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 
 /*
@@ -11,14 +10,14 @@ import java.util.ArrayList;
 * сейчас это XMLTestStorage, в будущем может быть SQLStorage или OracleStorage
 * */
 public class TestModel {
-    private ITestStorage testStorage;
+    private ITestStorage iTestStorage;
 
 
     /*
     * Инициализация с помощью одного из хранилищ
     * */
     public TestModel(){
-        this.testStorage = new XMLTestStorage();
+        this.iTestStorage = new XMLTestStorage();
     }
 
 
@@ -26,7 +25,7 @@ public class TestModel {
     * Сообщение об ошибке
     * */
     public String getErrorMessage() {
-        return testStorage.getErrorMessage();
+        return iTestStorage.getErrorMessage();
     }
 
 
@@ -35,7 +34,7 @@ public class TestModel {
      * и пишет в переменную
      * */
     public boolean getTestsFromStorage(){
-        return testStorage.getTestsFromStorage();
+        return iTestStorage.getTestsFromStorage();
     }
 
 
@@ -43,7 +42,7 @@ public class TestModel {
     * Возвращаем список тестов, которые до этого записали в переменную
     * */
     public ArrayList<Test> getAllTests(){
-        return testStorage.getAllTests();
+        return iTestStorage.getAllTests();
     }
 
 
@@ -51,19 +50,19 @@ public class TestModel {
     * Возвращаем толоко один (указанный) тест
     * Сначала надо выполнить команду getAllTest чтобы хранилище получило данные
     * */
-    public Test getTestByID(int id){ return testStorage.getTestByID(id); }
+    public Test getTestByID(int id){ return iTestStorage.getTestByID(id); }
 
     /*
     * Создаем новый тест в хранилище
     * */
-    public boolean CreateTest(String testHeader){return testStorage.createTest(testHeader);}
+    public boolean CreateTest(String testHeader){return iTestStorage.createTest(testHeader);}
 
 
     /*
     * Сохраняем изменения в тесте
     * */
     public boolean updateTest(int testID, String testHeader, int sortField) {
-        return testStorage.updateTest(testID, testHeader, sortField);
+        return iTestStorage.updateTest(testID, testHeader, sortField);
     }
 
 
@@ -71,14 +70,14 @@ public class TestModel {
     * Удаляем выбранный тест из базы
     * */
     public boolean deleteTest(int testID) {
-        return testStorage.deleteTest(testID);
+        return iTestStorage.deleteTest(testID);
     }
 
 
     /*
     * Меняем сортировку у нужного теста (двигаем вверх или вниз)
     * */
-    public boolean moveTest(String upDown, int testID){ return testStorage.moveTest(upDown, testID); }
+    public boolean moveTest(String upDown, int testID){ return iTestStorage.moveTest(upDown, testID); }
 
 
     /*
@@ -88,7 +87,7 @@ public class TestModel {
                                   String questionText,
                                   boolean isMultiChoice,
                                   String answerComment){
-        return testStorage.createQuestion(testID, questionText, isMultiChoice, answerComment);
+        return iTestStorage.createQuestion(testID, questionText, isMultiChoice, answerComment);
     }
 
 
@@ -100,14 +99,14 @@ public class TestModel {
                                   String questionText,
                                   boolean isMultiChoice,
                                   String answerComment){
-        return testStorage.updateQuestion(questionID, testID, questionText, isMultiChoice, answerComment);
+        return iTestStorage.updateQuestion(questionID, testID, questionText, isMultiChoice, answerComment);
     }
 
     /*
     * Удаляем вопрос из базы
     * */
     public boolean deleteQuestion(int questionID){
-        return testStorage.deleteQuestion(questionID);
+        return iTestStorage.deleteQuestion(questionID);
     }
 
 
@@ -115,7 +114,7 @@ public class TestModel {
     * Создаем ответ на указанный вопрос
     * */
     public boolean createAnswer(int questionID, String answerText, boolean isCorrect){
-        return testStorage.createAnswer(questionID, answerText, isCorrect);
+        return iTestStorage.createAnswer(questionID, answerText, isCorrect);
     }
 
 
@@ -123,7 +122,7 @@ public class TestModel {
     * Удаляем ответ на вопрос из базы
     * */
     public boolean deleteAnswer(int answerID){
-        return testStorage.deleteAnswer(answerID);
+        return iTestStorage.deleteAnswer(answerID);
     }
 
 }

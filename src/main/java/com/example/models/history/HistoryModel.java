@@ -61,7 +61,23 @@ public class HistoryModel {
     /*
     * Получаем следующий вопрос для тестирования
     * */
-    public HistoryRow GetNextQuestionForTesting(int historyHeaderiD){
-        return iHistoryStorage.GetNextQuestionForTesting(historyHeaderiD);
+    public HistoryHeader GetHeaderWithQuestionsText(int historyHeaderiD){
+        return iHistoryStorage.GetHeaderWithQuestionsText(historyHeaderiD);
     }
+
+
+    /*
+     * Ставим ответ в базе
+     * */
+    public boolean MakeRowAnswered(boolean answerResult, int headerID, int testID, int questionID){
+        return iHistoryStorage.MakeRowAnswered(answerResult, headerID, testID, questionID);
+    }
+
+    /*
+     * Удаляем заголовок теста из базы
+     * */
+    public boolean DeleteHistoryHeader(int headerID){
+        return iHistoryStorage.DeleteHistoryHeader(headerID);
+    }
+
 }

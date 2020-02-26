@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Preview before start</title>
+    <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
+</head>
+<body class="app">
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+    <!--Breadcrumbs-->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index">Main</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Preview before start testing</li>
+        </ol>
+    </nav>
+
+    <div class="app-body">
+        <main class="main">
+            <div class="container-fluid" >
+                <div class="row justify-content-center">
+                    <div class="card col-md-10" >
+                        <div class="card-body">
+
+                            <h2>[[${historyHeader.getHeaderText()}]]</h2>
+                            <p>Please review questions and click "start" when ready</p>
+                            <br>
+
+                            <p th:each="historyRow : ${historyHeader.getHistoryRows()}">
+                                [[${historyRow.getQuestion().getQuestionText()}]]
+                            </p>
+
+
+                            <div class="text-right">
+                                <a href="/index"
+                                   class="btn btn-secondary">Cancel</a>
+                                &nbsp;
+                                <a th:href="${'/testing/clearresults?historyHeaderId=' + historyHeader.getHeaderID()}"
+                                   class="btn btn-primary">Start</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+
+        });
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing in progress...</title>
+    <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
+</head>
+<body class="app">
+
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+    <!--Breadcrumbs-->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index">Main</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Test [[${historyHeader.getHeaderText()}]], &nbsp;question [[${historyHeader.GetQuantityAnswerredQuestions() + 1}]] of [[${historyHeader.getHistoryRows().size()}]]</li>
+        </ol>
+    </nav>
+
+
+    <div class="app-body">
+        <main class="main">
+            <div class="container-fluid" >
+                <div class="row justify-content-center">
+                    <div class="card col-md-10" >
+                        <div class="card-body">
+
+                            <div class="row">
+                                <p th:utext="${question.getQuestionTextAsTHML()}"></p>
+                            </div>
+
+
+                            <div class="row" id="divAnswerOptions">
+
+                                <form class="form-check"
+                                      th:unless="${question.isMultiChoice()}"
+                                      th:action="${'/testing/save?HeaderID=' +  historyRow.getHeaderID() + '&TestID=' + historyRow.getTestID() + '&QuestionID=' + historyRow.getQuestionID()}"
+                                      method="post">
+                                    <div class="form-check"
+                                         th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="exampleRadios"
+                                               th:id="${'option' + curQuestion.fakeID}"
+                                               th:value="${'option' + curQuestion.fakeID}"
+                                               th:attr="data-correct=${curQuestion.isCorrect()}">
+                                        <label class="form-check-label"
+                                               th:for="${'option' + curQuestion.fakeID}">[[${curQuestion.getAnswerText()}]]</label>
+                                    </div>
+                                    <input type="text"
+                                           name="ErrorsQty"
+                                           class="ErrorsQty"
+                                           value="0"
+                                           style="display: none" />
+                                </form>
+
+
+                                <form class="form-check"
+                                      th:if="${question.isMultiChoice()}"
+                                      th:action="${'/testing/save?HeaderID=' +  historyRow.getHeaderID() + '&TestID=' + historyRow.getTestID() + '&QuestionID=' + historyRow.getQuestionID()}"
+                                      method="post" >
+                                    <div class="form-check"
+                                         th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="exampleRadios"
+                                               th:id="${'option' + curQuestion.fakeID}"
+                                               th:value="${'option' + curQuestion.fakeID}"
+                                               th:attr="data-correct=${curQuestion.isCorrect()}">
+                                        <label class="form-check-label"
+                                               th:for="${'option' + curQuestion.fakeID}">[[${curQuestion.getAnswerText()}]]</label>
+                                    </div>
+                                    <input type="text"
+                                           name="ErrorsQty"
+                                           class="ErrorsQty"
+                                           value="0"
+                                           style="display: none" />
+                                </form>
+
+                            </div>
+
+
+
+                            <br/>
+                            <div class="text-right">
+                                <a href="#"
+                                   title="Stop testing and go back to mian"
+                                   class="btn btn-secondary">Stop testing</a>
+                                &nbsp;
+                                <input type="button"
+                                       title="Check answer"
+                                       class="btn btn-primary"
+                                       id="inputCheckAnswer"
+                                       value="Check answer">
+                                <input type="button"
+                                       title="Next question"
+                                       class="btn btn-primary"
+                                       id="inputNextQuestion"
+                                       value="Next question"
+                                       style="display: none" >
+                            </div>
+
+                            <br>
+                            <div class="row myQuestionAnswer" style="display: none">
+                                <p th:utext="${question.getAnswerCommentAsHTML()}"></p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            /*
+            * Проверяем ответы
+            * */
+            $('#inputCheckAnswer').click(function () {
+                $('.myQuestionAnswer').fadeIn();
+
+                var errorsQty = 0;
+
+                $('#divAnswerOptions').find('.form-check-input').each(function () {
+
+                    var isCorrect = $(this).data('correct');
+                    var isChecked = $(this).prop('checked');
+                    if (isCorrect != isChecked) {
+                        errorsQty++;
+                        $(this).parent().find('label').addClass('text-danger');
+                    }
+                    $(this).attr("disabled", true);
+                });
+
+                // Ставим количество ошибок в текстовое поле
+                $('.ErrorsQty').val(errorsQty);
+
+
+                // Прячем эту кнопку и показываем другую
+                $(this).hide();
+                $('#inputNextQuestion').show();
+            });
+
+
+
+            /*
+            * Отправляем форму на сервер
+            * */
+            $('#inputNextQuestion').click(function () {
+                $('.form-check').submit();
+            });
+
+
+
+        });
+    </script>
+
+</body>
+</html>

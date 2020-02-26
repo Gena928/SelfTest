@@ -41,9 +41,26 @@ public interface IHistoryStorage {
 
 
     /*
-    * Получаем следующий вопрос для тестирования из базы
+    * Получаем вопрос из истории по его ID
     * */
-    HistoryRow GetNextQuestionForTesting (int historyHeaderID);
+    public HistoryHeader GetHeaderByID(int historyHeaderID);
 
+
+    /*
+    * Получаем следующий вопрос для тестирования из базы
+    * к каждой строке вопроса будет "приделан" реальный вопрос, чтобы можно было читать текст
+    * */
+    HistoryHeader GetHeaderWithQuestionsText(int historyHeaderID);
+
+    /*
+     * Ставим ответ в базе
+     * */
+    boolean MakeRowAnswered(boolean answerResult, int headerID, int testID, int questionID);
+
+
+    /*
+    * Удаляем заголовок истории
+    * */
+    public boolean DeleteHistoryHeader(int headerID);
 
 }

@@ -74,7 +74,7 @@
                                   class="needs-validation" novalidate>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Is multi choice:</label>
+                                    <label class="col-sm-2 col-form-label">Is multi choice <br/> (click to change):</label>
                                     <div class="col-sm-10">
                                         <i th:class="${Question.isMultiChoice()} ? 'ChangeIcon iIsMultiChoice fa fa-check' : 'ChangeIcon iIsMultiChoice fa fa-times'"></i>
                                     </div>
@@ -91,7 +91,7 @@
                                         <textarea class="form-control"
                                                   id="questionHeader"
                                                   name="questionHeader"
-                                                  rows="4"
+                                                  rows="10"
                                                   th:inline="text"
                                                   required>[[${Question.getQuestionText()}]]</textarea>
                                         <div class="invalid-feedback" id="invalidHeader">
@@ -105,7 +105,7 @@
                                     <label class="col-sm-2 col-form-label">Answer:</label>
                                     <div class="col-sm-10">
                                         <textarea class="form-control"
-                                                  rows="4"
+                                                  rows="10"
                                                   th:inline="text"
                                                   id="questionAnswer"
                                                   name="questionAnswer"
@@ -327,7 +327,9 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            // Показываем или скрываем кнопку "Удалить" в списке ответов
+            /*
+            * Показываем или скрываем кнопку "Удалить" в списке ответов
+            * */
             $("#tableAnswerOptions tbody tr").hover(
                 function () {
                     $(this).find(".fa-trash-alt").show();
@@ -335,7 +337,10 @@
                     $(this).find(".fa-trash-alt").hide();
                 });
 
-            // Меняем иконки (крестик или галочка) в списке ответов
+
+            /*
+            * Меняем иконки (крестик или галочка) в списке ответов
+            * */
             $(".ChangeIcon").click(function () {
                 if ($(this).hasClass( "fa-times")){
                     $(this).removeClass( "fa-times");
@@ -347,7 +352,9 @@
             });
 
 
-            // Пользователь поменял галочку "IsMultiChoice"
+            /*
+            * Пользователь поменял галочку "IsMultiChoice"
+            * */
             $('.iIsMultiChoice').click(function () {
                 if ($(this).hasClass('fa-check')){
                     $('#inputIsMultichoice').val("1");
@@ -359,7 +366,9 @@
 
 
 
-            // Отправляем форму на сервер
+            /*
+            * Отправляем форму на сервер
+            * */
             $('#btnSave').click(function (e) {
                 $('#formQHeader').submit(); // answer will be submitted after header!
             });
@@ -407,9 +416,10 @@
             });
 
 
-
-            // Пользователь хочет удалить ответ на вопрос
-            // Надо получить ссылку (href) и немного её доработать, чтобы форма правильно ушла
+            /*
+            * Пользователь хочет удалить ответ на вопрос
+            * Надо получить ссылку (href) и немного её доработать, чтобы форма правильно ушла
+            * */
             $('#tableAnswerOptions tr i').click(function () {
 
                 // Образец ссылки => добавляем туда ID ответа
@@ -422,8 +432,10 @@
             });
 
 
-            // Пользователь кликнул на галочку в строке "Добавить вопрос"
-            // Надо сохранить значение (правильно или нет) в input чтобы потом нормально передалось с формой на сервер
+            /*
+            * Пользователь кликнул на галочку в строке "Добавить вопрос"
+            * Надо сохранить значение (правильно или нет) в input чтобы потом нормально передалось с формой на сервер
+            * */
             $('#aCreateNewAnswer').click(function () {
 
                 var HasClass = $(this).parent().parent().find('.fas').hasClass("fa-check");
@@ -440,8 +452,6 @@
                     $('#invalidNewAnswer').show();
                     return;
                 }
-
-
 
                 // Отправляем форму на сервер
                 $('#formNewAnswer').submit();

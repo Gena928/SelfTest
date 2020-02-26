@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 
@@ -64,12 +65,31 @@ public class IndexController {
                                  String txtQuestionsList){
 
         // Сохраняем список в базе
-        if (myHistoryModel.SaveTestToHistory(txtHeader, txtQuestionsList)== -1){
+        int newHeader = myHistoryModel.SaveTestToHistory(txtHeader, txtQuestionsList);
+        if (newHeader== -1){
+            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            return "redirect:error";
+        }
+
+        return "redirect:/testing/preview?historyHeaderId=" + newHeader;
+    }
+
+
+    /*
+    * Удаляем заголовок истории из базы
+    * */
+    @PostMapping("delete")
+    public String DeleteHeader(String headerID, HttpSession session, Model model){
+
+        // Удаляем вопрос из базы
+        if (myHistoryModel.DeleteHistoryHeader(Integer.valueOf(headerID)) == false){
             session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
             return "redirect:error";
         }
 
         return "redirect:index";
     }
+
+
 
 }

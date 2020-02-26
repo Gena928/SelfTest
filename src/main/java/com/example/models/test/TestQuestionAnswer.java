@@ -5,6 +5,7 @@ public class TestQuestionAnswer {
     private int answerID;
     private String answerText;
     private boolean isCorrect;
+    public int fakeID;              // ID фейковый - нужен для списков в HTML
 
     public int getQuestionID() {
         return questionID;

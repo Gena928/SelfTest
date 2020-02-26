@@ -1,6 +1,8 @@
 package com.example.models.test;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /*
 * Вариант ответа на тест.
@@ -13,8 +15,6 @@ public class TestQuestion {
     private String answerComment;
     private ArrayList<TestQuestionAnswer> testQuestionAnswers;
 
-
-
     public int getTestID() {
         return testID;
     }
@@ -22,8 +22,6 @@ public class TestQuestion {
     public void setTestID(int testID) {
         this.testID = testID;
     }
-
-
 
     public int getQuestionID() {
         return questionID;
@@ -33,16 +31,20 @@ public class TestQuestion {
         this.questionID = questionID;
     }
 
-
-
     public String getQuestionText() {
         return questionText;
+    }
+
+    /*
+    * Текст для HTML страницы
+    * */
+    public String getQuestionTextAsTHML(){
+        return textToHTML(questionText);
     }
 
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
     }
-
 
     /*
     * 150 символов из текста вопроса (надо для html формы)
@@ -69,12 +71,16 @@ public class TestQuestion {
         return answerComment;
     }
 
+    /*
+    * Возвращаем ответ для HTML страницы
+    * */
+    public String getAnswerCommentAsHTML(){
+        return textToHTML(answerComment);
+    }
+
     public void setAnswerComment(String answerComment) {
         this.answerComment = answerComment;
     }
-
-
-
 
     public boolean isMultiChoice() {
         return isMultiChoice;
@@ -85,9 +91,14 @@ public class TestQuestion {
     }
 
 
-
     public ArrayList<TestQuestionAnswer> getTestQuestionAnswers() {
         return testQuestionAnswers;
+    }
+
+    public ArrayList<TestQuestionAnswer> getTestQuestionAnswerShuffled(){
+        ArrayList<TestQuestionAnswer> shuffled = testQuestionAnswers;
+        Collections.shuffle(shuffled);
+        return shuffled;
     }
 
     public void setTestQuestionAnswers(ArrayList<TestQuestionAnswer> testQuestionAnswers) {
@@ -100,5 +111,14 @@ public class TestQuestion {
     }
 
 
-
+    /*
+    * Возвращаем текст в формате HTML
+    * */
+    private String textToHTML(String inputStr){
+        return inputStr
+                .replace("\n", "<br/>")
+                .replace("\r", "<br/>")
+                .replace("<br/><br/>", "<br/>")
+                .replace("<br/><br/>", "<br/>");
+    }
 }

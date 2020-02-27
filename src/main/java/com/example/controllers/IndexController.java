@@ -1,12 +1,11 @@
 package com.example.controllers;
 
-import com.example.models.history.HistoryModel;
-import com.example.models.test.TestModel;
+import com.example.models.questions.QuestionStorageProxy;
+import com.example.models.test.TestStorageProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,8 +13,8 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class IndexController {
 
-    TestModel myTestModel = new TestModel();
-    HistoryModel myHistoryModel = new HistoryModel();
+    QuestionStorageProxy myTestModel = new QuestionStorageProxy();
+    TestStorageProxy myTestStorageProxy = new TestStorageProxy();
 
 
     /*
@@ -25,13 +24,13 @@ public class IndexController {
     public String Welcome(HttpSession session, Model model){
 
         // Получаем историю из базы
-        if (!myHistoryModel.GetHistoryFromStorage()){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+        if (!myTestStorageProxy.GetGroupsFromStorage()){
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 
         // Добавляем историю работы в модель
-        model.addAttribute("historyHeaders", myHistoryModel.getAllTests());
+        model.addAttribute("historyHeaders", myTestStorageProxy.getAllTests());
 
         return "index";
     }
@@ -65,9 +64,9 @@ public class IndexController {
                                  String txtQuestionsList){
 
         // Сохраняем список в базе
-        int newHeader = myHistoryModel.SaveTestToHistory(txtHeader, txtQuestionsList);
+        int newHeader = myTestStorageProxy.CreateGroup(txtHeader, txtQuestionsList);
         if (newHeader== -1){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 
@@ -82,8 +81,8 @@ public class IndexController {
     public String DeleteHeader(String headerID, HttpSession session, Model model){
 
         // Удаляем вопрос из базы
-        if (myHistoryModel.DeleteHistoryHeader(Integer.valueOf(headerID)) == false){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+        if (myTestStorageProxy.DeleteTestGroup(Integer.valueOf(headerID)) == false){
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 

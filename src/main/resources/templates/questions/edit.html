@@ -37,11 +37,11 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item"><a href="/test/all">List of all available tests</a></li>
+            <li class="breadcrumb-item"><a href="/questionGroup/all">List of all available tests</a></li>
 
             <li class="breadcrumb-item">
-                <a th:href="@{/questions/index?testID=__${test.getTestID()}__}"
-                   title="See all questions for test">[[${test.getTestHeader()}]]</a>
+                <a th:href="@{/questions/index?testID=__${questionGroup.getTestID()}__}"
+                   title="See all questions for questionGroup">[[${questionGroup.getTestHeader()}]]</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">Edit question No.[[${Question.getQuestionID()}]]</li>
         </ol>
@@ -202,7 +202,7 @@
                             <!--Кнопка сохранения & отмены-->
                             <div class="text-right">
                                 <a class="btn btn-secondary"
-                                   th:href="@{/questions/index?testID=__${test.getTestID()}__}">Back to list</a>
+                                   th:href="@{/questions/index?testID=__${questionGroup.getTestID()}__}">Back to list</a>
                                 &nbsp
                                 <button type="button"
                                         class="btn btn-primary"

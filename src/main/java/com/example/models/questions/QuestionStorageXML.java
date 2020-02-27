@@ -1,8 +1,7 @@
-package com.example.models.test;
+package com.example.models.questions;
 
 
-import com.example.models.ITestStorage;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
+import com.example.models.IQuestionsStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,50 +19,51 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /*
-* Класс для работы для работы с тестами:
-*   - получение списка из базы
-*   - обновление;
-*   - добавление;
+* This class works with tests. A test is a list of questinons. I.e. test is like a header with a lot
+* of questions. You can use "history" classes later to orginize questions in groups and start actual testing process
+*   - it gets test/questions from database
+*   - updates test/questions;
+*   - removes test/questions from database;
 * */
-public class XMLTestStorage implements ITestStorage {
+public class QuestionStorageXML implements IQuestionsStorage {
 
-    private ArrayList<Test> allTests;
+    private ArrayList<QuestionGroup> allQuestionGroups;
     private String errorMessage;
-    private String testFileName = "src/main/resources/XMLfiles/Tests.xml";
+    private String testFileName = "src/main/resources/XMLfiles/Questions.xml";
 
 
     /*
-    * Конструктор
+    * Constructor
     * */
-    public XMLTestStorage(){
+    public QuestionStorageXML(){
 
     }
 
 
     /*
-    * Возвращаем список тестов
+    * List of all tests (each test contains several questions)
+    * you can use getTestsFromStorage() method to fill the list
     * */
     @Override
-    public ArrayList<Test> getAllTests() {
-        return allTests;
+    public ArrayList<QuestionGroup> getAllQuestionGroups() {
+        return allQuestionGroups;
     }
 
 
     /*
-    * Получаем тест по его ID (сначала надо выполнить getTestsFromStorage())
+    * Returns a test by it's ID
     * */
     @Override
-    public Test getTestByID(int id){
+    public QuestionGroup getTestByID(int id){
 
-        for (int i = 0; i<allTests.size(); i++){
-            if (allTests.get(i).getTestID() == id)
-                return allTests.get(i);
+        for (int i = 0; i< allQuestionGroups.size(); i++){
+            if (allQuestionGroups.get(i).getTestID() == id)
+                return allQuestionGroups.get(i);
         }
 
         return null;
@@ -72,7 +72,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Сообщение об ошибке (если такая была)
+    * Returns an error message
     * */
     @Override
     public String getErrorMessage() {
@@ -81,39 +81,39 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Получает список тестов из хранинища данных
-    * и пишет в переменную allTests
+    * Gets list of test from storage (XML, database or other).
+    * it should put a list into a local variable (i.e. not return here)
     * */
     @Override
     public boolean getTestsFromStorage(){
 
-        // Зачистка переменных
+        // Clear variables
         errorMessage = "";
-        allTests = new ArrayList<>();
+        allQuestionGroups = new ArrayList<>();
 
         try {
             Document doc = getXMLDocument(testFileName);
             NodeList nodeList = doc.getElementsByTagName("Test");
             for (int i = 0; i<nodeList.getLength(); i++){
                 Node currentNode = nodeList.item(i);
-                Test currentTest = new Test();
+                QuestionGroup currentQuestionGroup = new QuestionGroup();
                 int testID = Integer.parseInt(currentNode
                         .getAttributes()
                         .getNamedItem("TestID")
                         .getNodeValue());
 
                 String dateInString = currentNode.getAttributes().getNamedItem("CreatedDate").getNodeValue();
-                currentTest.setTestID(testID);
-                currentTest.setTestHeader(currentNode.getAttributes().getNamedItem("TestHeader").getNodeValue());
-                currentTest.setCreatedDate(DateFromString_ddMMyyyy(dateInString));
+                currentQuestionGroup.setTestID(testID);
+                currentQuestionGroup.setTestHeader(currentNode.getAttributes().getNamedItem("TestHeader").getNodeValue());
+                currentQuestionGroup.setCreatedDate(DateFromString_ddMMyyyy(dateInString));
 
                 int sortField = Integer.valueOf(currentNode.getAttributes().getNamedItem("SortField").getNodeValue());
-                currentTest.setSortField(sortField);
+                currentQuestionGroup.setSortField(sortField);
 
-                // Вопросы (сделан отдельный метод)
-                currentTest.setQuestions(getQuestionsFromXML(currentNode));
+                // Getting questions from XML node
+                currentQuestionGroup.setQuestions(getQuestionsFromXML(currentNode));
 
-                allTests.add(currentTest);
+                allQuestionGroups.add(currentQuestionGroup);
             }
 
         }
@@ -127,17 +127,18 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Обновляем тест в базе по его ID
+    * Updates a test by it's ID
     * */
     @Override
     public boolean updateTest(int testID, String testHeader, int sortField){
 
         Document doc;
 
-        // Убираем все что не похоже на русские/латинские буквы или числа
+        // Test header stored as usual string, therefore need to remove all
+        // non alphanumeric symbols (Russian and Latin)
         testHeader = testHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
 
-        // Читаем файл с диска
+        // Reading an XML from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -146,7 +147,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Обновляем XML узел
+        // Updating XML node
         try {
 
             NodeList nodeList = doc.getElementsByTagName("Test");
@@ -164,7 +165,7 @@ public class XMLTestStorage implements ITestStorage {
                 }
             }
 
-            // Сохраняем документ
+            // Saving document back to disk
             saveXMLDocument(testFileName, doc);
 
 
@@ -178,16 +179,17 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Создаем текст в хранилище
+    * Creates a test in xml file
     * */
     @Override
     public boolean createTest(String testHeader){
         Document doc;
 
-        // Убираем все что не похоже на русские/латинские буквы или числа
+        // Test header stored as usual string, therefore need to remove all
+        // non alphanumeric symbols (Russian and Latin)
         testHeader = testHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -196,7 +198,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Создаем новый элемент
+        // Creating new XML element
         try {
 
             Element rootElement = doc.getDocumentElement();
@@ -217,7 +219,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Writting XML back to disk
         try {
                 saveXMLDocument(testFileName, doc);
         }catch (Exception e){
@@ -230,14 +232,14 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Удаляем тест из базы
+    * Removes test from XML file
     * */
     @Override
     public boolean deleteTest(int testID){
 
         Document doc;
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -246,7 +248,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Удаляем тест
+        // Removing test
         try {
 
             NodeList nodeList = doc.getElementsByTagName("Test");
@@ -259,7 +261,7 @@ public class XMLTestStorage implements ITestStorage {
                     currentNode.getParentNode().removeChild(currentNode);
             }
 
-            // Сохраняем документ
+            // Saving document
             saveXMLDocument(testFileName, doc);
 
         }catch (Exception e){
@@ -267,27 +269,24 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Writting XML back to disk
         try {
             saveXMLDocument(testFileName, doc);
 
-            // Удаляем пустые строки
-            XMLTestStorage.RemoveNewLines(testFileName);
+            // Removing empty lines from XML doc
+            QuestionStorageXML.RemoveNewLines(testFileName);
 
         }catch (Exception e){
             errorMessage = "Can't write XML file with new test to disk: " + e.getMessage();
             return false;
         }
 
-
-
-
         return true;
     }
 
 
     /*
-    * Обновляем вопрос в базе
+    * Creates a new test in XML file
     * */
     @Override
     public boolean updateQuestion(int questionID,
@@ -297,7 +296,7 @@ public class XMLTestStorage implements ITestStorage {
                                   String answerComment){
         Document doc;
 
-        // Проверки данных
+        // Checking strings
         questionText = questionText.trim();
         answerComment = answerComment.trim();
         if (questionText.isEmpty()){
@@ -310,7 +309,7 @@ public class XMLTestStorage implements ITestStorage {
         }
 
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -319,7 +318,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Обновляем элемент в XML узле
+        // Updating XML element
         try {
 
             NodeList nodeList = doc.getElementsByTagName("Question");
@@ -343,15 +342,12 @@ public class XMLTestStorage implements ITestStorage {
                 }
             }
 
-            // Сохраняем документ
-            saveXMLDocument(testFileName, doc);
-
         }catch (Exception e){
             errorMessage = "Can't update XML node: " + e.getMessage();
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Saving XML document back to disk
         try {
             saveXMLDocument(testFileName, doc);
         }catch (Exception e){
@@ -364,8 +360,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Создаем новый вопрос в базе
-    * Возвращаем id нового вопроса
+    * Creates a new question in xml file
     * */
     @Override
     public int createQuestion(int testID,
@@ -376,7 +371,7 @@ public class XMLTestStorage implements ITestStorage {
         int questionID = -1;
 
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -385,7 +380,7 @@ public class XMLTestStorage implements ITestStorage {
             return -1;
         }
 
-        // Создаем новый элемент
+        // Creating a new question (XML node)
         try {
 
             XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -428,7 +423,7 @@ public class XMLTestStorage implements ITestStorage {
             return -1;
         }
 
-        // Пишем XML файл обратно на диск
+        // Writting XML document back to disk
         try {
             saveXMLDocument(testFileName, doc);
         }catch (Exception e){
@@ -441,13 +436,13 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Удаляем вопрос из базы
+    * Removes question from database
     * */
     @Override
     public boolean deleteQuestion(int questionID){
         Document doc;
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -456,7 +451,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Удаляем вопрос из базы
+        // Removing a question from database (from XML document)
         try {
 
             NodeList nodeList = doc.getElementsByTagName("Question");
@@ -478,12 +473,12 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Saving XML back to disk
         try {
             saveXMLDocument(testFileName, doc);
 
-            // Удаляем пустые строки
-            XMLTestStorage.RemoveNewLines(testFileName);
+            // Removing empty lines in XML document
+            QuestionStorageXML.RemoveNewLines(testFileName);
         }catch (Exception e){
             errorMessage = "Can't write XML file with new test to disk: " + e.getMessage();
             return false;
@@ -494,7 +489,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Обновляем текст ответа в базе
+    * Updates answer text in XML file
     * */
     @Override
     public boolean updateAnswer(int answerID, int questionID, String answerText, boolean isCorrect){
@@ -503,14 +498,14 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Создаем ответ на указанный вопрос в базе
+    * Creates an answer for this questionID
     * */
     @Override
     public boolean createAnswer(int questionID, String answerText, boolean isCorrect){
         Document doc;
 
 
-        // Читаем файл с диска
+        // Reading xml from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -519,7 +514,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Создаем новый элемент
+        // Creating a new answer (new XML node)
         try {
 
             XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -551,7 +546,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Writting file back to disk
         try {
             saveXMLDocument(testFileName, doc);
         }catch (Exception e){
@@ -564,13 +559,13 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Удаляем ответ в базе
+    * Removes an answer from XML storage
     * */
     @Override
     public boolean deleteAnswer(int answerID){
         Document doc;
 
-        // Читаем файл с диска
+        // Reading file from disk
         try {
             doc = getXMLDocument(testFileName);
         }
@@ -579,7 +574,7 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Удаляем ответ из базы
+        // Removing answer from XML document (removing xml node)
         try {
 
             NodeList nodeList = doc.getElementsByTagName("Answer");
@@ -600,12 +595,12 @@ public class XMLTestStorage implements ITestStorage {
             return false;
         }
 
-        // Пишем XML файл обратно на диск
+        // Writting XMl document back to disk
         try {
             saveXMLDocument(testFileName, doc);
 
-            // Удаляем пустые строки
-            XMLTestStorage.RemoveNewLines(testFileName);
+            // Removing all empty lines in XML document
+            QuestionStorageXML.RemoveNewLines(testFileName);
         }catch (Exception e){
             errorMessage = "Can't write XML file with new test to disk: " + e.getMessage();
             return false;
@@ -616,42 +611,44 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Меняем порядок следования теста (переносим его вверх или вниз)
+    * Moves the test UP or DOWN (changes it's sorting order)
     * */
     @Override
     public boolean moveTest(String upDown, int testID){
 
-        // Получаем список тестов из базы
+        // Getting a list of test from XML document
         if (!getTestsFromStorage())
             return false;
 
-        // Сортируем
-        allTests.sort(Comparator.comparing(Test::getSortField));
+        // Sorting
+        allQuestionGroups.sort(Comparator.comparing(QuestionGroup::getSortField));
 
-        // меняем sortField у нужного теста
-        for (int i = 0; i<allTests.size(); i++){
-            Test currentTest = allTests.get(i);
+        // Now we change "sort field" property of ONE test
+        // i.e. pushing it up or down
+        for (int i = 0; i< allQuestionGroups.size(); i++){
+            QuestionGroup currentQuestionGroup = allQuestionGroups.get(i);
 
-            if (currentTest.getTestID() == testID){
+            if (currentQuestionGroup.getTestID() == testID){
                 if (upDown.equals("up"))
-                    currentTest.setSortField(currentTest.getSortField() - 150);
+                    currentQuestionGroup.setSortField(currentQuestionGroup.getSortField() - 150);
                 else
-                    currentTest.setSortField(currentTest.getSortField() + 150);
+                    currentQuestionGroup.setSortField(currentQuestionGroup.getSortField() + 150);
             }
         }
 
-        // Выравниваем sortField - чтобы было 100, 200, 300, 400....
-        allTests.sort(Comparator.comparing(Test::getSortField));
+        // Sorting the list with tests. This will move desired test up or down
+        allQuestionGroups.sort(Comparator.comparing(QuestionGroup::getSortField));
+
+        // Now we make all "sort fields" smooth (100, 200, 300, 400...)
         int sort = 100;
-        for (int i = 0; i<allTests.size(); i++){
-            allTests.get(i).setSortField(sort);
+        for (int i = 0; i< allQuestionGroups.size(); i++){
+            allQuestionGroups.get(i).setSortField(sort);
             sort+= 100;
         }
 
-        // Пишем значения sortField в документ
+        // Writting SortField values back to XML document
         Document doc;
 
-        // Обновляем XML узел
         try {
             doc = getXMLDocument(testFileName);
 
@@ -662,16 +659,16 @@ public class XMLTestStorage implements ITestStorage {
                 int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("TestID").getNodeValue());
                 int currentSort = 0;
 
-                for (int j = 0; j<allTests.size(); j++){
-                    if (allTests.get(j).getTestID() == currentID)
-                        currentSort = allTests.get(j).getSortField();
+                for (int j = 0; j< allQuestionGroups.size(); j++){
+                    if (allQuestionGroups.get(j).getTestID() == currentID)
+                        currentSort = allQuestionGroups.get(j).getSortField();
                 }
 
                 Node attrSort = currentNode.getAttributes().getNamedItem("SortField");
                 attrSort.setTextContent(String.valueOf(currentSort));
             }
 
-            // Сохраняем документ
+            // Saving the document
             saveXMLDocument(testFileName, doc);
 
 
@@ -685,7 +682,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-     * Метод нужен для удаления пустых строк из XML файла
+     * Removes empty lines from XML file
      * */
     public static void RemoveNewLines(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -708,10 +705,10 @@ public class XMLTestStorage implements ITestStorage {
     }
 
 
-    //<editor-fold desc="Локальные методы">
+    //<editor-fold desc="Local methods">
+
     /*
-    * Создаем документ и возвращаем обратно
-    * Метод используется много раз, поэтому вынесен в отдельный кусок кода
+    * Creates XML document
     * */
     private Document getXMLDocument(String fileName) throws Exception{
 
@@ -728,7 +725,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Сохраняем документ обратно на диск
+    * Saves XML document back to disk
     * */
     private void saveXMLDocument(String fileName, Document doc) throws Exception{
 
@@ -747,8 +744,8 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Метод позволяет получить максимальный ID из элементов
-    *
+    * Gets maximuim ID number for selected tag.
+    * This way you can increment ID numbers
     * */
     private int getMaxID(String fileName, String tagName, String attributeName) throws Exception {
         int maxId = 0;
@@ -766,7 +763,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Получаем текущую дату в формате dd.MM.yyyy (строка)
+    * Gets current date as String dd.MM.yyyy
     * */
     private String TodayAs_ddMMyyyy(){
 
@@ -777,7 +774,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Преобразуем строку в дату
+    * Converts string to date
     * */
     private Date DateFromString_ddMMyyyy(String input) throws ParseException {
 
@@ -793,19 +790,19 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Получаем вопросы из XML узла
+    * Gets a list of TestQuestion from XML node
     * */
-    private ArrayList<TestQuestion> getQuestionsFromXML(Node currentNode) throws Exception{
-        ArrayList<TestQuestion> allQuestions = new ArrayList<>();
+    private ArrayList<Question> getQuestionsFromXML(Node currentNode) throws Exception{
+        ArrayList<Question> allQuestions = new ArrayList<>();
         int testID = Integer.parseInt(currentNode
                 .getAttributes()
                 .getNamedItem("TestID")
                 .getNodeValue());
 
-        // Вопросы теста
+        // Questions of the test
         NodeList xmlQuestions = ((Element)currentNode).getElementsByTagName("Question");
         for (int q=0; q<xmlQuestions.getLength(); q++){
-            TestQuestion currentQuestion = new TestQuestion();
+            Question currentQuestion = new Question();
             Node xmlCurrentQuestion = xmlQuestions.item(q);
 
             int questionID = Integer.parseInt(
@@ -835,8 +832,8 @@ public class XMLTestStorage implements ITestStorage {
             currentQuestion.setMultiChoice(Boolean.valueOf(isMultiChoice));
 
 
-            // Варианты ответов
-            currentQuestion.setTestQuestionAnswers(getAnswersFromXML(xmlCurrentQuestion));
+            // Answer options
+            currentQuestion.setQuestionAnswers(getAnswersFromXML(xmlCurrentQuestion));
 
             allQuestions.add(currentQuestion);
         }
@@ -846,10 +843,10 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Получаем ответы на вопрос из XML узла
+    * Gets an list of TestQuestionAnswer from XML node
     * */
-    private ArrayList<TestQuestionAnswer> getAnswersFromXML(Node questionNode) throws Exception {
-        ArrayList<TestQuestionAnswer> result = new ArrayList<>();
+    private ArrayList<QuestionAnswer> getAnswersFromXML(Node questionNode) throws Exception {
+        ArrayList<QuestionAnswer> result = new ArrayList<>();
 
         NodeList xmlQuestions = ((Element)questionNode).getElementsByTagName("Answer");
         for (int i = 0; i<xmlQuestions.getLength(); i++){
@@ -872,8 +869,7 @@ public class XMLTestStorage implements ITestStorage {
 
             String answerText = BytesToString(currentAnswer.getTextContent());
 
-            // Добавляем новый элемент в коллекцию
-            TestQuestionAnswer a = new TestQuestionAnswer();
+            QuestionAnswer a = new QuestionAnswer();
             a.setAnswerID(Integer.valueOf(strAnswerID));
             a.setQuestionID(Integer.valueOf(strQuestionID));
             a.setCorrect(Boolean.valueOf(strIsCorrect));
@@ -885,7 +881,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Преобразуем строку в массив символов
+    * Converts a string into an array of symbols (like (100 117 109 109 121)
     * */
     private String stringToBytes(String input) throws UnsupportedEncodingException {
 
@@ -899,7 +895,7 @@ public class XMLTestStorage implements ITestStorage {
 
 
     /*
-    * Преобразуем массив символов (100 117 109 109 121) в нормальную строку
+    * Converts an array of symbols (like (100 117 109 109 121) back to normal string
     * */
     private String BytesToString(String inputBytes) throws UnsupportedEncodingException{
 
@@ -911,8 +907,6 @@ public class XMLTestStorage implements ITestStorage {
 
         return new String(bytes, "UTF-8");
     }
-
-
 
     //</editor-fold>
 

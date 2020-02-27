@@ -1,6 +1,5 @@
-package com.example.models.history;
+package com.example.models.test;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,29 +8,29 @@ import java.util.Random;
 /*
 * Один тест из таблицы с историей (содержит в себе множество строк)
 * */
-public class HistoryHeader {
-    private int headerID;
+public class TestGroup {
+    private int groupID;
     private Date createdDate;
     private boolean isFinished;
-    private ArrayList<HistoryRow> historyRows;
+    private ArrayList<Test> tests;
     private String headerText;
 
 
     /*
     * Конструктор (параметры по умолчанию)
     * */
-    public HistoryHeader(){
-        this.historyRows = new ArrayList<>();
+    public TestGroup(){
+        this.tests = new ArrayList<>();
         this.createdDate = Calendar.getInstance().getTime();
         this.isFinished = false;
     }
 
-    public int getHeaderID() {
-        return headerID;
+    public int getGroupID() {
+        return groupID;
     }
 
-    public void setHeaderID(int headerID) {
-        this.headerID = headerID;
+    public void setGroupID(int groupID) {
+        this.groupID = groupID;
     }
 
     public Date getCreatedDate() {
@@ -50,12 +49,12 @@ public class HistoryHeader {
         isFinished = finished;
     }
 
-    public ArrayList<HistoryRow> getHistoryRows() {
-        return historyRows;
+    public ArrayList<Test> getTests() {
+        return tests;
     }
 
-    public void setHistoryRows(ArrayList<HistoryRow> historyRows) {
-        this.historyRows = historyRows;
+    public void setTests(ArrayList<Test> tests) {
+        this.tests = tests;
     }
 
     public String getHeaderText() {return headerText;}
@@ -68,8 +67,8 @@ public class HistoryHeader {
     * */
     public int GetQuantityUnansweredQuestions(){
         int qty = 0;
-        for (int i = 0; i<historyRows.size(); i++){
-            if (historyRows.get(i).isQuestionAnswered() == false)
+        for (int i = 0; i< tests.size(); i++){
+            if (tests.get(i).isQuestionAnswered() == false)
                 qty++;
         }
         return qty;
@@ -79,7 +78,7 @@ public class HistoryHeader {
     * Количество отвеченных вопросов
     * */
     public int GetQuantityAnswerredQuestions(){
-        return historyRows.size() - GetQuantityUnansweredQuestions();
+        return tests.size() - GetQuantityUnansweredQuestions();
     }
 
 
@@ -89,8 +88,8 @@ public class HistoryHeader {
     public int GetQuantityCorrectAnswers(){
         int result = 0;
 
-        for (int i = 0; i<historyRows.size(); i++){
-            if (historyRows.get(i).isAnswerResult() == true)
+        for (int i = 0; i< tests.size(); i++){
+            if (tests.get(i).isAnswerResult() == true)
                 result++;
         }
 
@@ -102,7 +101,7 @@ public class HistoryHeader {
     * Процент правильно отвеченных вопросов
     * */
     public int GetCorrectAnswersPercent(){
-        double ttl = historyRows.size();
+        double ttl = tests.size();
         double correct = GetQuantityCorrectAnswers();
 
         return (int)((correct / ttl)*100);
@@ -113,14 +112,14 @@ public class HistoryHeader {
     * Выдаем случайный неотвеченный вопрос из базы
     * (нужно для тестирования)
     * */
-    public HistoryRow GetRandomUnansweredQuestion(){
+    public Test GetRandomUnansweredQuestion(){
 
-        if (historyRows.size() == 0)
+        if (tests.size() == 0)
             return null;
 
-        ArrayList<HistoryRow> rows = new ArrayList<>();
-        for (int i = 0; i<historyRows.size(); i++){
-            HistoryRow currentRow = historyRows.get(i);
+        ArrayList<Test> rows = new ArrayList<>();
+        for (int i = 0; i< tests.size(); i++){
+            Test currentRow = tests.get(i);
             if (currentRow.isQuestionAnswered() == false)
                 rows.add(currentRow);
         }
@@ -130,7 +129,7 @@ public class HistoryHeader {
 
         // Случайный вопрос
         Random random = new Random();
-        HistoryRow result = rows.get(random.nextInt(rows.size()));
+        Test result = rows.get(random.nextInt(rows.size()));
 
         return result;
     }

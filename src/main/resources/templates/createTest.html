@@ -27,7 +27,7 @@
                 <div class="card col-md-10" >
                     <div class="card-body">
                         <h2>Choose questions</h2>
-                        <p>Select a questions before you start your test</p>
+                        <p>Select a questions before you start your questionGroup</p>
 
 
                         <form method="post"
@@ -59,28 +59,28 @@
                                 <label class="col-sm-2 col-form-label">Please select questions:</label>
                                 <div class="col-sm-10" style="padding-top: 7px;">
 
-                                    <div th:each="test : ${modelTests}">
+                                    <div th:each="questionGroup : ${modelTests}">
                                         <!--Название теста (ссылочка)-->
                                         <p >
-                                            <a data-toggle="collapse" th:href="@{'#HeaderNo' + ${test.getTestID()}}"
-                                               aria-expanded="false" th:aria-controls="@{'HeaderNo' + ${test.getTestID()}}"
-                                            > &nbsp;[[${test.getTestHeader()}]]</a>
+                                            <a data-toggle="collapse" th:href="@{'#HeaderNo' + ${questionGroup.getTestID()}}"
+                                               aria-expanded="false" th:aria-controls="@{'HeaderNo' + ${questionGroup.getTestID()}}"
+                                            > &nbsp;[[${questionGroup.getTestHeader()}]]</a>
                                         </p>
 
                                         <!--Контейнер со списком вопросов-->
-                                        <div class="collapse" th:id="@{'HeaderNo' + ${test.getTestID()}}" >
+                                        <div class="collapse" th:id="@{'HeaderNo' + ${questionGroup.getTestID()}}" >
                                             <div class="card card-body">
 
                                                 <!--Выбрать все вопросы-->
                                                 <div class="form-check">
-                                                    <input class="form-check-input myAll" type="checkbox" value="" th:id="@{'SelectAll' + ${test.getTestID()}}">
-                                                    <label class="form-check-label" th:for="@{'SelectAll' + ${test.getTestID()}}">
+                                                    <input class="form-check-input myAll" type="checkbox" value="" th:id="@{'SelectAll' + ${questionGroup.getTestID()}}">
+                                                    <label class="form-check-label" th:for="@{'SelectAll' + ${questionGroup.getTestID()}}">
                                                         All
                                                     </label>
                                                 </div>
 
                                                 <!--Список отдельных вопросов-->
-                                                <div th:each="question : ${test.getQuestions()}" class="form-check">
+                                                <div th:each="question : ${questionGroup.getQuestions()}" class="form-check">
                                                     <input class="form-check-input myCheckbox"
                                                            type="checkbox"
                                                            th:attr="data-qid=${question.getQuestionID()}, data-tid=${question.getTestID()}"
@@ -102,7 +102,7 @@
 
                                     <a class="btn btn-secondary" href="index" title="Back to main page">Cancel</a>
                                     &nbsp;
-                                    <button type="submit" class="btn btn-primary" title="Create a new test and start testing process...">Create test</button>
+                                    <button type="submit" class="btn btn-primary" title="Create a new questionGroup and start testing process...">Create questionGroup</button>
 
                             </div>
                         </form>
@@ -152,8 +152,8 @@
         $('#formHeader').submit(function () {
 
             // Количество символов в заголовке
-            var testHeader = $('#txtHeader').val();
-            if (testHeader.length < 10){
+            var test = $('#txtHeader').val();
+            if (test.length < 10){
                 $('#invalidHeader').show();
                 return false;
             } else {
@@ -176,7 +176,7 @@
 
             // Если ничего не выбрано!
             if(qty == 0)
-                return showMessage('Please select questions for your test!');
+                return showMessage('Please select questions for your questionGroup!');
             else
                 $('#txtQuestionsList').val(inputText);
 

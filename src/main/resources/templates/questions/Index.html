@@ -16,8 +16,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item"><a href="/test/all">List of all available tests</a></li>
-            <li class="breadcrumb-item active" aria-current="page">[[${test.getTestHeader()}]]</li>
+            <li class="breadcrumb-item"><a href="/questionGroup/all">List of all available tests</a></li>
+            <li class="breadcrumb-item active" aria-current="page">[[${questionGroup.getTestHeader()}]]</li>
         </ol>
     </nav>
 
@@ -40,11 +40,11 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr th:each="question : ${test.getQuestions()}"
+                                    <tr th:each="question : ${questionGroup.getQuestions()}"
                                         style="text-align: center">
 
                                         <td style="text-align: left">
-                                            <a th:href="@{/questions/edit?testID=__${test.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
+                                            <a th:href="@{/questions/edit?testID=__${questionGroup.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
                                                title="Edit"
                                                style="text-decoration: none">
                                                 [[${question.getQuestion150chars()}]]
@@ -62,7 +62,7 @@
                                         <td style="vertical-align: middle">
                                             <!--Переходим на страницу для редактирования вопроса теста-->
                                             <div class="myRowIcons" style="display: none">
-                                                <a th:href="@{/questions/edit?testID=__${test.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
+                                                <a th:href="@{/questions/edit?testID=__${questionGroup.getTestID()}__&QuestionID=__${question.getQuestionID()}__}"
                                                    title="Edit question"
                                                    style="text-decoration: none">
                                                     <i class="fa fa-edit"></i>
@@ -124,7 +124,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No, thanks</button>
                     <!--<button type="button" class="btn btn-primary">Yes, create a question</button>-->
-                    <a class="btn btn-primary" th:href="@{/questions/add?testID=__${test.getTestID()}__}">Yes, create a question</a>
+                    <a class="btn btn-primary" th:href="@{/questions/add?testID=__${questionGroup.getTestID()}__}">Yes, create a question</a>
 
                 </div>
             </div>
@@ -152,12 +152,12 @@
                         </div>
                         <div class="text-right">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <a th:href="@{/questions/delete?testID=__${test.getTestID()}__&QuestionID=0}"
+                            <a th:href="@{/questions/delete?testID=__${questionGroup.getTestID()}__&QuestionID=0}"
                                id="aDeleteLink"
                                class="btn btn-danger" >Yes, delete</a>
                             <span id="spanHrefSample"
                                   hidden="hidden"
-                                  th:text="@{/questions/delete?testID=__${test.getTestID()}__&QuestionID=100500}"></span>
+                                  th:text="@{/questions/delete?testID=__${questionGroup.getTestID()}__&QuestionID=100500}"></span>
                         </div>
                     </form>
 

@@ -24,12 +24,12 @@
                     <div class="card col-md-10" >
                         <div class="card-body">
 
-                            <h2>[[${historyHeader.getHeaderText()}]]</h2>
+                            <h2>[[${testGroup.getHeaderText()}]]</h2>
                             <p>Please review questions and click "start" when ready</p>
                             <br>
 
-                            <p th:each="historyRow : ${historyHeader.getHistoryRows()}">
-                                [[${historyRow.getQuestion().getQuestionText()}]]
+                            <p th:each="test : ${testGroup.getHistoryRows()}">
+                                [[${test.getQuestion().getQuestionText()}]]
                             </p>
 
 
@@ -37,7 +37,7 @@
                                 <a href="/index"
                                    class="btn btn-secondary">Cancel</a>
                                 &nbsp;
-                                <a th:href="${'/testing/clearresults?historyHeaderId=' + historyHeader.getHeaderID()}"
+                                <a th:href="${'/testing/clearresults?historyHeaderId=' + testGroup.getHeaderID()}"
                                    class="btn btn-primary">Start</a>
                             </div>
                         </div>

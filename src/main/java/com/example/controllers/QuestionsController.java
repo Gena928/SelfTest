@@ -1,8 +1,8 @@
 package com.example.controllers;
 
-import com.example.models.test.Test;
-import com.example.models.test.TestModel;
-import com.example.models.test.TestQuestion;
+import com.example.models.questions.QuestionGroup;
+import com.example.models.questions.QuestionStorageProxy;
+import com.example.models.questions.Question;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
-import java.security.PublicKey;
 
 @Controller
 @RequestMapping("/questions")
 public class QuestionsController {
 
-    TestModel myTestModel = new TestModel();
+    QuestionStorageProxy myTestModel = new QuestionStorageProxy();
 
 
     /*
@@ -126,13 +125,13 @@ public class QuestionsController {
         }
 
         // Добавляем тест в модель
-        Test currentTest = myTestModel.getTestByID(testID);
-        model.addAttribute("test", currentTest);
+        QuestionGroup currentQuestionGroup = myTestModel.getTestByID(testID);
+        model.addAttribute("test", currentQuestionGroup);
 
         // Добавляем вопрос в модель
-        TestQuestion currentQuestion = new TestQuestion();
-        if (currentTest.GetQuestionByID(QuestionID) != null)
-            currentQuestion = currentTest.GetQuestionByID(QuestionID);
+        Question currentQuestion = new Question();
+        if (currentQuestionGroup.GetQuestionByID(QuestionID) != null)
+            currentQuestion = currentQuestionGroup.GetQuestionByID(QuestionID);
 
         model.addAttribute("Question", currentQuestion);
 
@@ -166,8 +165,8 @@ public class QuestionsController {
 
 
         // Ищем вопрос в текущем тесте
-        Test currentTest = myTestModel.getTestByID(testID);
-        TestQuestion currentQuestion = currentTest.GetQuestionByID(QuestionID);
+        QuestionGroup currentQuestionGroup = myTestModel.getTestByID(testID);
+        Question currentQuestion = currentQuestionGroup.GetQuestionByID(QuestionID);
 
         if (currentQuestion == null)
             return new ResponseEntity<>("question id was not found in database", HttpStatus.BAD_REQUEST);

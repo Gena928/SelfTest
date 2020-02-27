@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Edit selected test</title>
+    <title>Edit selected questionGroup</title>
 
     <!--CoreUI css (Bootstrap) and Font Awesome-->
     <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
@@ -17,8 +17,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item"><a href="/test/all">List of all available tests</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit test</li>
+            <li class="breadcrumb-item"><a href="/questionGroup/all">List of all available tests</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit questionGroup</li>
         </ol>
     </nav>
 
@@ -30,11 +30,11 @@
                     <div class="card col-md-10" >
                         <div class="card-body">
 
-                            <h2>Edit test header</h2>
+                            <h2>Edit questionGroup header</h2>
                             <hr>
 
                             <form method="post"
-                                  action="/test/edit"
+                                  action="/questionGroup/edit"
                                   id="formEditTest"
                                   class="needs-validation" novalidate >
 
@@ -45,7 +45,7 @@
                                                class="form-control-plaintext"
                                                id="testID"
                                                name="testID"
-                                               th:value="${test.getTestID()}" />
+                                               th:value="${questionGroup.getTestID()}" />
                                     </div>
                                 </div>
 
@@ -56,7 +56,7 @@
                                                class="form-control-plaintext"
                                                id="createdDate"
                                                name="createdDate"
-                                               th:value="${test.getCreatedDate_ddMMyyyy()}" />
+                                               th:value="${questionGroup.getCreatedDate_ddMMyyyy()}" />
                                     </div>
                                 </div>
 
@@ -68,7 +68,7 @@
                                                class="form-control-plaintext"
                                                id="sortID"
                                                name="sortID"
-                                               th:value="${test.getSortField()}"/>
+                                               th:value="${questionGroup.getSortField()}"/>
                                     </div>
                                 </div>
 
@@ -80,18 +80,18 @@
                                                class="form-control"
                                                id="inputHeader"
                                                name="inputHeader"
-                                               th:value="${test.getTestHeader()}"
+                                               th:value="${questionGroup.getTestHeader()}"
                                                placeholder="Only latin letters and numbers!"
                                                required maxlength="100"/>
                                             <div class="invalid-feedback">
-                                                Please provide test name.
+                                                Please provide questionGroup name.
                                             </div>
                                     </div>
                                 </div>
 
                                 <div class="row text-right float-right">
                                     <a class="btn btn-secondary"
-                                       href="/test/all"
+                                       href="/questionGroup/all"
                                        role="button">Cancel</a>
                                     &nbsp; &nbsp;
                                     <button type="submit"

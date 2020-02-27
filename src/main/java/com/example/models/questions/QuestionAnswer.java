@@ -1,11 +1,15 @@
-package com.example.models.test;
+package com.example.models.questions;
 
-public class TestQuestionAnswer {
+/*
+* Answer option for question
+* I.e. one of the possible answers (can be correct and not correct)
+* */
+public class QuestionAnswer {
     private int questionID;
     private int answerID;
     private String answerText;
     private boolean isCorrect;
-    public int fakeID;              // ID фейковый - нужен для списков в HTML
+    public int fakeID;              // ID fake id. Need for HTML only
 
     public int getQuestionID() {
         return questionID;

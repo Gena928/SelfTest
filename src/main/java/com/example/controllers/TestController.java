@@ -1,7 +1,7 @@
 package com.example.controllers;
 
-import com.example.models.test.Test;
-import com.example.models.test.TestModel;
+import com.example.models.questions.QuestionGroup;
+import com.example.models.questions.QuestionStorageProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Comparator;
 
 
@@ -22,7 +21,7 @@ import java.util.Comparator;
 @RequestMapping("/test")
 public class TestController {
 
-    TestModel myTestModel = new TestModel();
+    QuestionStorageProxy myTestModel = new QuestionStorageProxy();
 
 
     /*
@@ -38,7 +37,7 @@ public class TestController {
         }
 
         // Сортировка перед выдачей
-        myTestModel.getAllTests().sort(Comparator.comparing(Test::getSortField));
+        myTestModel.getAllTests().sort(Comparator.comparing(QuestionGroup::getSortField));
 
         model.addAttribute("tests", myTestModel.getAllTests());
         Boolean listHasValues = (myTestModel.getAllTests().size() > 0) ? true : false;

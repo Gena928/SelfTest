@@ -14,7 +14,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Test [[${historyHeader.getHeaderText()}]], &nbsp;question [[${historyHeader.GetQuantityAnswerredQuestions() + 1}]] of [[${historyHeader.getHistoryRows().size()}]]</li>
+            <li class="breadcrumb-item active" aria-current="page">Test [[${testGroup.getHeaderText()}]], &nbsp;question [[${testGroup.GetQuantityAnswerredQuestions() + 1}]] of [[${testGroup.getHistoryRows().size()}]]</li>
         </ol>
     </nav>
 
@@ -35,7 +35,7 @@
 
                                 <form class="form-check"
                                       th:unless="${question.isMultiChoice()}"
-                                      th:action="${'/testing/save?HeaderID=' +  historyRow.getHeaderID() + '&TestID=' + historyRow.getTestID() + '&QuestionID=' + historyRow.getQuestionID()}"
+                                      th:action="${'/testing/save?HeaderID=' +  test.getHeaderID() + '&TestID=' + test.getTestID() + '&QuestionID=' + test.getQuestionID()}"
                                       method="post">
                                     <div class="form-check"
                                          th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">
@@ -58,7 +58,7 @@
 
                                 <form class="form-check"
                                       th:if="${question.isMultiChoice()}"
-                                      th:action="${'/testing/save?HeaderID=' +  historyRow.getHeaderID() + '&TestID=' + historyRow.getTestID() + '&QuestionID=' + historyRow.getQuestionID()}"
+                                      th:action="${'/testing/save?HeaderID=' +  test.getHeaderID() + '&TestID=' + test.getTestID() + '&QuestionID=' + test.getQuestionID()}"
                                       method="post" >
                                     <div class="form-check"
                                          th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">

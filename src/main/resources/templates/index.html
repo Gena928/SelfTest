@@ -32,9 +32,9 @@
                                     <td style="width: 80px"></td>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="historyHeader : ${historyHeaders}">
+                                    <tr th:each="testGroup : ${historyHeaders}">
                                         <td>
-                                            [[${historyHeader.getHeaderID()}]]
+                                            [[${testGroup.getHeaderID()}]]
                                         </td>
 
                                         <td>
@@ -42,14 +42,14 @@
                                             <div class="progress-group">
                                                 <div class="progress-group-header align-items-end">
                                                     <i class="cui-globe progress-group-icon"></i>
-                                                    <div>[[${historyHeader.getHeaderText()}]]</div>
-                                                    <div class="ml-auto font-weight-bold mr-2">[[${historyHeader.GetQuantityCorrectAnswers()}]] of [[${historyHeader.getHistoryRows().size()}]]</div>
-                                                    <div class="text-muted small">([[${historyHeader.GetCorrectAnswersPercent()}]]%)</div>
+                                                    <div>[[${testGroup.getHeaderText()}]]</div>
+                                                    <div class="ml-auto font-weight-bold mr-2">[[${testGroup.GetQuantityCorrectAnswers()}]] of [[${testGroup.getHistoryRows().size()}]]</div>
+                                                    <div class="text-muted small">([[${testGroup.GetCorrectAnswersPercent()}]]%)</div>
                                                 </div>
                                                 <div class="progress-group-bars">
                                                     <div class="progress progress-xs">
                                                         <div class="progress-bar bg-success" role="progressbar"
-                                                             th:style="'width: ' + ${historyHeader.GetCorrectAnswersPercent()} + '%'"
+                                                             th:style="'width: ' + ${testGroup.GetCorrectAnswersPercent()} + '%'"
                                                              aria-valuenow="56"
                                                              aria-valuemin="0"
                                                              aria-valuemax="100"></div>
@@ -59,8 +59,8 @@
                                         </td>
 
                                         <td>
-                                            <a th:href="@{testing/preview?historyHeaderId=__${historyHeader.getHeaderID()}__}"
-                                               title="Retake the test"
+                                            <a th:href="@{testing/preview?historyHeaderId=__${testGroup.getHeaderID()}__}"
+                                               title="Retake the questionGroup"
                                                style="display:none; text-decoration: none"
                                                class="aHidden">
                                                 <i class="fa fa-redo"></i>
@@ -73,7 +73,7 @@
                                                      title="Delete this history record"
                                                      class="aHidden">
                                                 <i class="fa fa-trash"
-                                                   th:attr="data-hid=${historyHeader.getHeaderID()}" ></i>
+                                                   th:attr="data-hid=${testGroup.getHeaderID()}" ></i>
                                             </a>
                                         </td>
                                     </tr>

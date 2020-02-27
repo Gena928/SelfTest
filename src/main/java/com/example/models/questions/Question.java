@@ -1,19 +1,18 @@
-package com.example.models.test;
+package com.example.models.questions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
 /*
-* Вариант ответа на тест.
+* One question in test (contains multiple answer options)
 * */
-public class TestQuestion {
+public class Question {
     private int testID;
     private int questionID;
     private String questionText;
     private boolean isMultiChoice;
-    private String answerComment;
-    private ArrayList<TestQuestionAnswer> testQuestionAnswers;
+    private String answerComment;       // Explanation of correct answer. I.e. why it is correct
+    private ArrayList<QuestionAnswer> questionAnswers;
 
     public int getTestID() {
         return testID;
@@ -36,7 +35,7 @@ public class TestQuestion {
     }
 
     /*
-    * Текст для HTML страницы
+    * For HTML page (replaces new line with <br/>
     * */
     public String getQuestionTextAsTHML(){
         return textToHTML(questionText);
@@ -47,7 +46,7 @@ public class TestQuestion {
     }
 
     /*
-    * 150 символов из текста вопроса (надо для html формы)
+    * First 150 symbols of question header
     * */
     public String getQuestion150chars(){
         int len = questionText.length();
@@ -57,7 +56,7 @@ public class TestQuestion {
     }
 
     /*
-    * 50 символов из теста вопроса (надо для html формы)
+    * First 50 symbols of question header
     * */
     public String getQuestion50chars(){
         int len = questionText.length();
@@ -72,7 +71,8 @@ public class TestQuestion {
     }
 
     /*
-    * Возвращаем ответ для HTML страницы
+    * Comment for question as HTML
+    * Comment is an explanation of correct answer. Why it is correct?
     * */
     public String getAnswerCommentAsHTML(){
         return textToHTML(answerComment);
@@ -91,28 +91,28 @@ public class TestQuestion {
     }
 
 
-    public ArrayList<TestQuestionAnswer> getTestQuestionAnswers() {
-        return testQuestionAnswers;
+    public ArrayList<QuestionAnswer> getQuestionAnswers() {
+        return questionAnswers;
     }
 
-    public ArrayList<TestQuestionAnswer> getTestQuestionAnswerShuffled(){
-        ArrayList<TestQuestionAnswer> shuffled = testQuestionAnswers;
+    public ArrayList<QuestionAnswer> getTestQuestionAnswerShuffled(){
+        ArrayList<QuestionAnswer> shuffled = questionAnswers;
         Collections.shuffle(shuffled);
         return shuffled;
     }
 
-    public void setTestQuestionAnswers(ArrayList<TestQuestionAnswer> testQuestionAnswers) {
-        this.testQuestionAnswers = testQuestionAnswers;
+    public void setQuestionAnswers(ArrayList<QuestionAnswer> questionAnswers) {
+        this.questionAnswers = questionAnswers;
     }
 
-    // Количество ответов на вопрос
+    // Quantity of answer options
     public int getAnswersQty(){
-        return (this.testQuestionAnswers == null) ? 0 : testQuestionAnswers.size();
+        return (this.questionAnswers == null) ? 0 : questionAnswers.size();
     }
 
 
     /*
-    * Возвращаем текст в формате HTML
+    * Local method - replaces new line symbol with <br/>
     * */
     private String textToHTML(String inputStr){
         return inputStr

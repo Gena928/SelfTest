@@ -1,9 +1,9 @@
 package com.example.controllers;
 
-import com.example.models.history.HistoryHeader;
-import com.example.models.history.HistoryModel;
-import com.example.models.history.HistoryRow;
-import com.example.models.test.TestQuestionAnswer;
+import com.example.models.test.TestGroup;
+import com.example.models.test.TestStorageProxy;
+import com.example.models.test.Test;
+import com.example.models.questions.QuestionAnswer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/testing")
 public class TestingController {
 
-    HistoryModel myHistoryModel = new HistoryModel();
+    TestStorageProxy myTestStorageProxy = new TestStorageProxy();
 
     /*
     * Clear test results before start testing
@@ -31,8 +31,8 @@ public class TestingController {
             HttpSession session, Model model){
 
         // Зачищаем результаты тестирования
-        if (!myHistoryModel.ClearTestReslts(historyHeaderId) ){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+        if (!myTestStorageProxy.ClearGroupResults(historyHeaderId) ){
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 
@@ -49,9 +49,9 @@ public class TestingController {
 
 
         // Ищем заголовок для текущего тестирования
-        HistoryHeader header = myHistoryModel.GetHeaderWithQuestionsText(historyHeaderId);
+        TestGroup header = myTestStorageProxy.GetGroupWithQuestionText(historyHeaderId);
         if (header == null){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 
@@ -71,9 +71,9 @@ public class TestingController {
                        HttpSession session, Model model){
 
         // Ищем заголовок для текущего тестирования
-        HistoryHeader header = myHistoryModel.GetHeaderWithQuestionsText(historyHeaderId);
+        TestGroup header = myTestStorageProxy.GetGroupWithQuestionText(historyHeaderId);
         if (header == null){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 
@@ -86,12 +86,12 @@ public class TestingController {
         model.addAttribute("historyHeader", header);
 
         // Добавляем НЕ отвеченный вопрос
-        HistoryRow currentRow = header.GetRandomUnansweredQuestion();
+        Test currentRow = header.GetRandomUnansweredQuestion();
         model.addAttribute("historyRow", currentRow);
 
         // Ставим ID в варианты ответа (тупо фейковые номера, чтобы можно было опознать их в HTML форме)
-        for (int i = 0; i<currentRow.getQuestion().getTestQuestionAnswers().size(); i++){
-            TestQuestionAnswer q = currentRow.getQuestion().getTestQuestionAnswers().get(i);
+        for (int i = 0; i<currentRow.getQuestion().getQuestionAnswers().size(); i++){
+            QuestionAnswer q = currentRow.getQuestion().getQuestionAnswers().get(i);
             q.fakeID = i;
         }
 
@@ -118,8 +118,8 @@ public class TestingController {
 
 
         // Ставим результат ответа на данный вопрос
-        if (!myHistoryModel.MakeRowAnswered(answerResult, HeaderID, TestID, QuestionID) ){
-            session.setAttribute("errorMessage" , myHistoryModel.getErrorMessage());
+        if (!myTestStorageProxy.MakeTestAnswered(answerResult, HeaderID, TestID, QuestionID) ){
+            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
             return "redirect:error";
         }
 

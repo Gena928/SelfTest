@@ -31,7 +31,7 @@
 
                             <!--Если нет данных - показываем приглашение создать тест-->
                             <span th:if="${!listHasValues}">
-                                <i class="far fa-grin fa-2x"></i> &nbsp; Wow such empty here. Please add some test to start working.
+                                <i class="far fa-grin fa-2x"></i> &nbsp; Wow such empty here. Please add some questionGroup to start working.
                             </span>
 
 
@@ -51,27 +51,27 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr th:each="test : ${tests}"  style="text-align: center">
+                                    <tr th:each="questionGroup : ${tests}"  style="text-align: center">
 
                                         <td style="text-align: left">
-                                            <a th:href="@{/questions/index?testID=__${test.getTestID()}__}"
-                                               title="Edit test questions"
-                                               th:text="${test.getTestHeader()}">
+                                            <a th:href="@{/questions/index?testID=__${questionGroup.getTestID()}__}"
+                                               title="Edit questionGroup questions"
+                                               th:text="${questionGroup.getTestHeader()}">
                                             </a>
 
                                         </td>
-                                        <td th:text="${test.getQuestionsQty()}">Questions qty</td>
-                                        <td th:text="${test.getCreatedDate_ddMMyyyy()}">Created date</td>
+                                        <td th:text="${questionGroup.getQuestionsQty()}">Questions qty</td>
+                                        <td th:text="${questionGroup.getCreatedDate_ddMMyyyy()}">Created date</td>
 
                                         <!--up or down buttons-->
                                         <td>
                                             <div class="myRowIcons" style="display: none;">
-                                                <a th:href="@{/test/sort?updown=up&testID=__${test.getTestID()}__}"
+                                                <a th:href="@{/questionGroup/sort?updown=up&testID=__${questionGroup.getTestID()}__}"
                                                    style="text-decoration: none;" title="Move up">
                                                     <i class="fa fa-chevron-up" ></i>
                                                 </a>
                                                 &nbsp;
-                                                <a th:href="@{/test/sort?updown=down&testID=__${test.getTestID()}__}"
+                                                <a th:href="@{/questionGroup/sort?updown=down&testID=__${questionGroup.getTestID()}__}"
                                                    title="Move down">
                                                     <i class="fa fa-chevron-down" ></i>
                                                 </a>
@@ -82,14 +82,14 @@
                                         <!--delete or update buttons-->
                                         <td>
                                             <div class="myRowIcons" style="display: none">
-                                                <a th:href="@{/test/edit?id=__${test.getTestID()}__}"
-                                                   title="Edit test title"
+                                                <a th:href="@{/questionGroup/edit?id=__${questionGroup.getTestID()}__}"
+                                                   title="Edit questionGroup title"
                                                     style="text-decoration: none">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 &nbsp;
-                                                <a th:href="@{/test/delete?id=__${test.getTestID()}__}"
-                                                    title="Remove test"
+                                                <a th:href="@{/questionGroup/delete?id=__${questionGroup.getTestID()}__}"
+                                                    title="Remove questionGroup"
                                                     style="text-decoration: none">
                                                     <i class="fa fa-trash-alt"></i>
                                                 </a>
@@ -132,14 +132,14 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">New test</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">New questionGroup</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
 
-                    <form method="post" action="/test/create" id="formNewTest" class="needs-validation" novalidate>
+                    <form method="post" action="/questionGroup/create" id="formNewTest" class="needs-validation" novalidate>
                         <div class="form-group row">
                             <label for="testName" class="col-sm-2 col-form-label">Name:</label>
                             <div class="col-sm-10">
@@ -150,7 +150,7 @@
                                        placeholder="Only latin letters and numbers!"
                                         required maxlength="100">
                                 <div class="invalid-feedback">
-                                    Please provide test name.
+                                    Please provide questionGroup name.
                                 </div>
                             </div>
                         </div>
@@ -187,7 +187,7 @@
 
 
 
-            // Submitting the form with new test details to server
+            // Submitting the form with new questionGroup details to server
             $("#btnSubmit").click(function(){
                 $("#btnHiddenSubmit").click();
             });

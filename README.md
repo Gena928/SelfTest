@@ -5,13 +5,13 @@ No database required (XML based).
 
 Application features:
 - create as many questions as you want;
-- orginize questions into groups (tests);
-- test yourself and get scores;
+- orginize questions into groups;
+- create tests from questions;
 
 
 Short description
-- "test" package contains code, related to creating a questions;
-- "history" package contains code, related to testing process - i.e. when you choose a questions for testing and do testing itself.
+- "questions" package contains code, related to creating a questions;
+- "test" package contains code, related to testing process - i.e. when you choose a questions for testing and do testing itself.
 
 
 

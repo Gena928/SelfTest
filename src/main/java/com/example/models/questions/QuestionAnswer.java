@@ -5,19 +5,11 @@ package com.example.models.questions;
 * I.e. one of the possible answers (can be correct and not correct)
 * */
 public class QuestionAnswer {
-    private int questionID;
     private int answerID;
     private String answerText;
     private boolean isCorrect;
     public int fakeID;              // ID fake id. Need for HTML only
 
-    public int getQuestionID() {
-        return questionID;
-    }
-
-    public void setQuestionID(int questionID) {
-        this.questionID = questionID;
-    }
 
     public int getAnswerID() {
         return answerID;

@@ -46,34 +46,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * List of all tests (each test contains several questions)
-    * you can use getTestsFromStorage() method to fill the list
-    * */
-    @Override
-    public ArrayList<QuestionGroup> getAllQuestionGroups() {
-        return allQuestionGroups;
-    }
-
-
-    /*
-    * Returns a test by it's ID
-    * */
-    @Override
-    public QuestionGroup getTestByID(int id){
-
-        for (int i = 0; i< allQuestionGroups.size(); i++){
-            if (allQuestionGroups.get(i).getTestID() == id)
-                return allQuestionGroups.get(i);
-        }
-
-        return null;
-    }
-
-
-
-    /*
-    * Returns an error message
-    * */
+     * Returns an error message
+     * */
     @Override
     public String getErrorMessage() {
         return errorMessage;
@@ -81,11 +55,68 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Gets list of test from storage (XML, database or other).
-    * it should put a list into a local variable (i.e. not return here)
+     * List of all QuestionGroups (each group contains several questions)
+     * you can use getGroupsFromStorage() method to fill the list
+     * */
+    @Override
+    public ArrayList<QuestionGroup> getAllQuestionGroups() {
+        return allQuestionGroups;
+    }
+
+
+    /*
+     * Returns a group by it's ID
+     *
+     * @groupID - id of the group to be returned
+     * */
+    @Override
+    public QuestionGroup getGroupByID(int groupID){
+
+        // Get all groups from file
+        if (getGroupsFromStorage() == false)
+            return null;
+
+        for (int i = 0; i< allQuestionGroups.size(); i++){
+            if (allQuestionGroups.get(i).getGroupID() == groupID)
+                return allQuestionGroups.get(i);
+        }
+        errorMessage = "group was not found in database";
+        return null;
+    }
+
+
+    /*
+    * Returns a group by question ID
+    *
+    * @questionID id of the question to be returned
     * */
     @Override
-    public boolean getTestsFromStorage(){
+    public QuestionGroup getGroupByQuestionID(int questionID){
+
+        // Getting all groups from file
+        if (getGroupsFromStorage() == false)
+            return null;
+
+        // Iterating all groups and searching required questionID
+        for (int group = 0; group<allQuestionGroups.size(); group++){
+            QuestionGroup currentGroup = allQuestionGroups.get(group);
+            for (int q = 0; q<currentGroup.getQuestions().size();q++ ){
+                if (questionID == currentGroup.getQuestions().get(q).getQuestionID())
+                    return currentGroup;
+            }
+        }
+
+        errorMessage = "Group was not found in database";
+        return null;
+    }
+
+
+
+    /*
+     * Fills local array with QuestionGroups
+     * */
+    @Override
+    public boolean getGroupsFromStorage(){
 
         // Clear variables
         errorMessage = "";
@@ -93,18 +124,20 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
         try {
             Document doc = getXMLDocument(testFileName);
-            NodeList nodeList = doc.getElementsByTagName("Test");
+
+            // Iterating all groups in XML file
+            NodeList nodeList = doc.getElementsByTagName("QuestionGroup");
             for (int i = 0; i<nodeList.getLength(); i++){
                 Node currentNode = nodeList.item(i);
                 QuestionGroup currentQuestionGroup = new QuestionGroup();
-                int testID = Integer.parseInt(currentNode
+                int groupID = Integer.parseInt(currentNode
                         .getAttributes()
-                        .getNamedItem("TestID")
+                        .getNamedItem("id")
                         .getNodeValue());
 
                 String dateInString = currentNode.getAttributes().getNamedItem("CreatedDate").getNodeValue();
-                currentQuestionGroup.setTestID(testID);
-                currentQuestionGroup.setTestHeader(currentNode.getAttributes().getNamedItem("TestHeader").getNodeValue());
+                currentQuestionGroup.setGroupID(groupID);
+                currentQuestionGroup.setGroupHeader(currentNode.getAttributes().getNamedItem("Header").getNodeValue());
                 currentQuestionGroup.setCreatedDate(DateFromString_ddMMyyyy(dateInString));
 
                 int sortField = Integer.valueOf(currentNode.getAttributes().getNamedItem("SortField").getNodeValue());
@@ -127,16 +160,16 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Updates a test by it's ID
-    * */
+     * Updates a group by it's ID
+     * */
     @Override
-    public boolean updateTest(int testID, String testHeader, int sortField){
+    public boolean updateGroup(int groupID, String groupHeader, int sortField){
 
         Document doc;
 
         // Test header stored as usual string, therefore need to remove all
         // non alphanumeric symbols (Russian and Latin)
-        testHeader = testHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
+        groupHeader = groupHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
 
         // Reading an XML from disk
         try {
@@ -150,15 +183,15 @@ public class QuestionStorageXML implements IQuestionsStorage {
         // Updating XML node
         try {
 
-            NodeList nodeList = doc.getElementsByTagName("Test");
+            NodeList nodeList = doc.getElementsByTagName("QuestionGrop");
             for (int i = 0; i<nodeList.getLength(); i++) {
                 Node currentNode = nodeList.item(i);
 
-                int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("TestID").getNodeValue());
+                int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("id").getNodeValue());
 
-                if (currentID == testID){
-                    Node attrHeader = currentNode.getAttributes().getNamedItem("TestHeader");
-                    attrHeader.setTextContent(testHeader);
+                if (currentID == groupID){
+                    Node attrHeader = currentNode.getAttributes().getNamedItem("Header");
+                    attrHeader.setTextContent(groupHeader);
 
                     Node attrSort = currentNode.getAttributes().getNamedItem("SortField");
                     attrSort.setTextContent(String.valueOf(sortField));
@@ -179,15 +212,15 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Creates a test in xml file
-    * */
+     * Creates a new group of questions in storage
+     * */
     @Override
-    public boolean createTest(String testHeader){
+    public boolean createGroup(String groupHeader){
         Document doc;
 
         // Test header stored as usual string, therefore need to remove all
         // non alphanumeric symbols (Russian and Latin)
-        testHeader = testHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
+        groupHeader = groupHeader.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
 
         // Reading file from disk
         try {
@@ -203,12 +236,12 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
             Element rootElement = doc.getDocumentElement();
 
-            Element element = doc.createElement("Test");
-            int nextID = getMaxID(testFileName, "Test", "TestID") + 1;
-            int nextSort = getMaxID(testFileName, "Test", "SortField") + 100;
+            Element element = doc.createElement("QuestionGroup");
+            int nextID = getMaxID(testFileName, "QuestionGroup", "id") + 1;
+            int nextSort = getMaxID(testFileName, "QuestionGroup", "SortField") + 100;
 
-            element.setAttribute("TestID", String.valueOf(nextID));
-            element.setAttribute("TestHeader", testHeader);
+            element.setAttribute("id", String.valueOf(nextID));
+            element.setAttribute("Header", groupHeader);
             element.setAttribute("SortField", String.valueOf(nextSort));
             element.setAttribute("CreatedDate", TodayAs_ddMMyyyy());
             rootElement.appendChild(element);
@@ -221,7 +254,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
         // Writting XML back to disk
         try {
-                saveXMLDocument(testFileName, doc);
+            saveXMLDocument(testFileName, doc);
         }catch (Exception e){
             errorMessage = "Can't write XML file with new test to disk: " + e.getMessage();
             return false;
@@ -232,10 +265,10 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Removes test from XML file
-    * */
+     * Removes QuestionGroup from database
+     * */
     @Override
-    public boolean deleteTest(int testID){
+    public boolean deleteGroup(int groupID){
 
         Document doc;
 
@@ -251,13 +284,15 @@ public class QuestionStorageXML implements IQuestionsStorage {
         // Removing test
         try {
 
-            NodeList nodeList = doc.getElementsByTagName("Test");
+            NodeList nodeList = doc.getElementsByTagName("QuestionGroup");
             for (int i = 0; i<nodeList.getLength(); i++) {
                 Node currentNode = nodeList.item(i);
-
-                int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("TestID").getNodeValue());
-
-                if (currentID == testID)
+                int currentID = Integer.parseInt(currentNode
+                        .getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue()
+                );
+                if (currentID == groupID)
                     currentNode.getParentNode().removeChild(currentNode);
             }
 
@@ -286,11 +321,16 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Creates a new test in XML file
-    * */
+     * Updates a question in storage
+     *
+     * @questionID - id of a question to be updated
+     * @questionText - question
+     * @isMultiChoice - is this question a multi choice question?
+     * @answerComment - comment for answer
+     *
+     * */
     @Override
     public boolean updateQuestion(int questionID,
-                                  int testID,
                                   String questionText,
                                   boolean isMultiChoice,
                                   String answerComment){
@@ -326,9 +366,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
                 Node currentNode = nodeList.item(i);
 
                 int qID = Integer.parseInt(currentNode.getAttributes().getNamedItem("id").getNodeValue());
-                int tID = Integer.parseInt(currentNode.getAttributes().getNamedItem("testID").getNodeValue());
 
-                if (qID == questionID && tID == testID){
+                if (qID == questionID){
 
                     Node qHeader = ((Element)currentNode).getElementsByTagName("Qtext").item(0);
                     qHeader.setTextContent(stringToBytes(questionText));
@@ -338,7 +377,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
                     Node attrIsMultiChoice = currentNode.getAttributes().getNamedItem("IsMultiChoice");
                     attrIsMultiChoice.setTextContent(String.valueOf(isMultiChoice));
-
                 }
             }
 
@@ -360,16 +398,20 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Creates a new question in xml file
-    * */
+     * Creates a new question in storage
+     *
+     * @groupID - id of the QuestionGroup, where you need to create this question
+     * @questionText - text of the question
+     * @isMultiChoice - is this question multi choice? (radio buttons or checkboxes on HTML form)
+     * @answerComment - comment for the question answer
+     * */
     @Override
-    public int createQuestion(int testID,
+    public int createQuestion(int groupID,
                                   String questionText,
                                   boolean isMultiChoice,
                                   String answerComment){
         Document doc;
         int questionID = -1;
-
 
         // Reading file from disk
         try {
@@ -385,7 +427,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
-            String xpathString = "//Test[@TestID=repl" + String.valueOf(testID) +  "repl]";
+            String xpathString = "//QuestionGroup[@id=repl" + String.valueOf(groupID) +  "repl]";
             xpathString = xpathString.replaceAll("repl","\"");
 
 
@@ -402,7 +444,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
                     int nextID = getMaxID(testFileName, "Question", "id") + 1;
                     questionID = nextID;
                     newQuestion.setAttribute("id", String.valueOf(nextID));
-                    newQuestion.setAttribute("testID", String.valueOf(testID));
                     newQuestion.setAttribute("IsMultiChoice", String.valueOf(isMultiChoice));
 
                     Element QText = doc.createElement("Qtext");
@@ -436,8 +477,10 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Removes question from database
-    * */
+     * Removes a question from storage
+     *
+     * @questionID - id of the question to be removed
+     * */
     @Override
     public boolean deleteQuestion(int questionID){
         Document doc;
@@ -458,8 +501,10 @@ public class QuestionStorageXML implements IQuestionsStorage {
             for (int i = 0; i<nodeList.getLength(); i++) {
                 Node currentNode = nodeList.item(i);
 
-                int qID = Integer.parseInt(currentNode.getAttributes().getNamedItem("id").getNodeValue());
-                int tID = Integer.parseInt(currentNode.getAttributes().getNamedItem("testID").getNodeValue());
+                int qID = Integer.parseInt(currentNode.getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue()
+                );
 
                 if (qID == questionID){
                     currentNode.getParentNode().removeChild(currentNode);
@@ -489,8 +534,13 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Updates answer text in XML file
-    * */
+     * Updates a answer text in storage
+     *
+     * @answerID - id of the answer in database
+     * @questionID - id of the question in database
+     * @answerText - new text of the answer
+     * @isCorrect - is this answer correct?
+     * */
     @Override
     public boolean updateAnswer(int answerID, int questionID, String answerText, boolean isCorrect){
         return false;
@@ -498,8 +548,12 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Creates an answer for this questionID
-    * */
+     * Creates a new answer for question
+     *
+     * @questionID - id of the question where you need to create the answer
+     * @answerText - text of the answer
+     * @isCorrect - is this answer correct or not
+     * */
     @Override
     public boolean createAnswer(int questionID, String answerText, boolean isCorrect){
         Document doc;
@@ -533,7 +587,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
                     int nextID = getMaxID(testFileName, "Answer", "id") + 1;
 
                     newAnswer.setAttribute("id", String.valueOf(nextID));
-                    newAnswer.setAttribute("QuestionID", String.valueOf(questionID));
                     newAnswer.setAttribute("IsCorrect", String.valueOf(isCorrect));
                     newAnswer.setTextContent(stringToBytes(answerText));
 
@@ -559,8 +612,10 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Removes an answer from XML storage
-    * */
+     * Deletes answer from question
+     *
+     * @answerID - id of the answer to be removed
+     * */
     @Override
     public boolean deleteAnswer(int answerID){
         Document doc;
@@ -611,13 +666,16 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Moves the test UP or DOWN (changes it's sorting order)
-    * */
+     * Moves the test UP or DOWN (changes it's sorting order)
+     *
+     * @upDown - string (up/down) which shows direction for movement
+     * @groupID - id of the group to be moved
+     * */
     @Override
-    public boolean moveTest(String upDown, int testID){
+    public boolean moveTest(String upDown, int groupID){
 
         // Getting a list of test from XML document
-        if (!getTestsFromStorage())
+        if (!getGroupsFromStorage())
             return false;
 
         // Sorting
@@ -628,7 +686,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
         for (int i = 0; i< allQuestionGroups.size(); i++){
             QuestionGroup currentQuestionGroup = allQuestionGroups.get(i);
 
-            if (currentQuestionGroup.getTestID() == testID){
+            if (currentQuestionGroup.getGroupID() == groupID){
                 if (upDown.equals("up"))
                     currentQuestionGroup.setSortField(currentQuestionGroup.getSortField() - 150);
                 else
@@ -652,15 +710,15 @@ public class QuestionStorageXML implements IQuestionsStorage {
         try {
             doc = getXMLDocument(testFileName);
 
-            NodeList nodeList = doc.getElementsByTagName("Test");
+            NodeList nodeList = doc.getElementsByTagName("QuestionGroup");
             for (int i = 0; i<nodeList.getLength(); i++) {
                 Node currentNode = nodeList.item(i);
 
-                int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("TestID").getNodeValue());
+                int currentID = Integer.parseInt(currentNode.getAttributes().getNamedItem("id").getNodeValue());
                 int currentSort = 0;
 
                 for (int j = 0; j< allQuestionGroups.size(); j++){
-                    if (allQuestionGroups.get(j).getTestID() == currentID)
+                    if (allQuestionGroups.get(j).getGroupID() == currentID)
                         currentSort = allQuestionGroups.get(j).getSortField();
                 }
 
@@ -683,6 +741,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
      * Removes empty lines from XML file
+     *
+     * @fileName - fileName where you need to remove lines
      * */
     public static void RemoveNewLines(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -709,6 +769,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
     * Creates XML document
+    *
+    * @fileName - name of the file, which should be read
     * */
     private Document getXMLDocument(String fileName) throws Exception{
 
@@ -726,6 +788,9 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
     * Saves XML document back to disk
+    *
+    * @fileName - name of the file to read
+    * @doc - XML document, which must be saved to this file
     * */
     private void saveXMLDocument(String fileName, Document doc) throws Exception{
 
@@ -744,8 +809,11 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Gets maximuim ID number for selected tag.
-    * This way you can increment ID numbers
+    * Gets maximuim ID number for selected tag.This way you can increment ID numbers
+    *
+    * @fileName - name of the file where to search
+    * @tagName - XML tag name
+    * @attributeName - XML attribute name
     * */
     private int getMaxID(String fileName, String tagName, String attributeName) throws Exception {
         int maxId = 0;
@@ -775,6 +843,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
     * Converts string to date
+    *
+    * @input - input string, containing date DD.MM.YYYY format
     * */
     private Date DateFromString_ddMMyyyy(String input) throws ParseException {
 
@@ -790,14 +860,12 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Gets a list of TestQuestion from XML node
+    * Gets a list of Questions from XML node
+    *
+    * @currentNode - XML node for searching
     * */
     private ArrayList<Question> getQuestionsFromXML(Node currentNode) throws Exception{
         ArrayList<Question> allQuestions = new ArrayList<>();
-        int testID = Integer.parseInt(currentNode
-                .getAttributes()
-                .getNamedItem("TestID")
-                .getNodeValue());
 
         // Questions of the test
         NodeList xmlQuestions = ((Element)currentNode).getElementsByTagName("Question");
@@ -825,7 +893,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
                     .getTextContent();
             aComment = BytesToString(aComment);
 
-            currentQuestion.setTestID(testID);
             currentQuestion.setQuestionID(questionID);
             currentQuestion.setQuestionText(qText);
             currentQuestion.setAnswerComment(aComment);
@@ -843,7 +910,9 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
 
     /*
-    * Gets an list of TestQuestionAnswer from XML node
+    * Gets an list of QuestionAnswers from XML node
+    *
+    * @questionNode - XML node to search answers
     * */
     private ArrayList<QuestionAnswer> getAnswersFromXML(Node questionNode) throws Exception {
         ArrayList<QuestionAnswer> result = new ArrayList<>();
@@ -857,11 +926,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
                     .getNamedItem("IsCorrect")
                     .getNodeValue();
 
-            String strQuestionID = currentAnswer
-                    .getAttributes()
-                    .getNamedItem("QuestionID")
-                    .getNodeValue();
-
             String strAnswerID = currentAnswer
                     .getAttributes()
                     .getNamedItem("id")
@@ -871,7 +935,6 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
             QuestionAnswer a = new QuestionAnswer();
             a.setAnswerID(Integer.valueOf(strAnswerID));
-            a.setQuestionID(Integer.valueOf(strQuestionID));
             a.setCorrect(Boolean.valueOf(strIsCorrect));
             a.setAnswerText(answerText);
             result.add(a);
@@ -882,6 +945,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
     * Converts a string into an array of symbols (like (100 117 109 109 121)
+    *
+    * @input - text
     * */
     private String stringToBytes(String input) throws UnsupportedEncodingException {
 
@@ -896,6 +961,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
     /*
     * Converts an array of symbols (like (100 117 109 109 121) back to normal string
+    *
+    * @inputBytes - string, containing numbers
     * */
     private String BytesToString(String inputBytes) throws UnsupportedEncodingException{
 

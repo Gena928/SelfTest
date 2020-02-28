@@ -3,7 +3,6 @@ package com.example.controllers;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-
 /*
 *   https://www.baeldung.com/spring-mvc-tutorial
 *   Each application built using Spring Boot needs merely to define the main entry point.

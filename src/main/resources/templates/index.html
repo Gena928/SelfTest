@@ -32,9 +32,9 @@
                                     <td style="width: 80px"></td>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="testGroup : ${historyHeaders}">
+                                    <tr th:each="testGroup : ${testGroups}">
                                         <td>
-                                            [[${testGroup.getHeaderID()}]]
+                                            [[${testGroup.getGroupID()}]]
                                         </td>
 
                                         <td>
@@ -43,8 +43,8 @@
                                                 <div class="progress-group-header align-items-end">
                                                     <i class="cui-globe progress-group-icon"></i>
                                                     <div>[[${testGroup.getHeaderText()}]]</div>
-                                                    <div class="ml-auto font-weight-bold mr-2">[[${testGroup.GetQuantityCorrectAnswers()}]] of [[${testGroup.getHistoryRows().size()}]]</div>
-                                                    <div class="text-muted small">([[${testGroup.GetCorrectAnswersPercent()}]]%)</div>
+                                                    <div class="ml-auto font-weight-bold mr-2">[[${testGroup.GetQuantityCorrectAnswers()}]] of [[${testGroup.getTests().size()}]]</div>
+                                                    <div class="text-muted small">([[${test.GetCorrectAnswersPercent()}]]%)</div>
                                                 </div>
                                                 <div class="progress-group-bars">
                                                     <div class="progress progress-xs">
@@ -73,7 +73,7 @@
                                                      title="Delete this history record"
                                                      class="aHidden">
                                                 <i class="fa fa-trash"
-                                                   th:attr="data-hid=${testGroup.getHeaderID()}" ></i>
+                                                   th:attr="data-hid=${testGroup.getGroupID()}" ></i>
                                             </a>
                                         </td>
                                     </tr>

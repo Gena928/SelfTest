@@ -3,7 +3,7 @@
 
     <!--CSS styles-->
     <html th:fragment="CssStyles">
-        <link rel="stylesheet" th:href="@{../css/CoreUI/CoreUI.min.css}">
+        <link rel="stylesheet" th:href="@{/css/CoreUI/CoreUI.min.css}">
         <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.11.2/css/all.min.css}" />
     </html>
 
@@ -15,7 +15,7 @@
                 <a class="nav-link fa fa-chart-bar fa-2x" href="/index" title="Back to main" data-toggle="tooltip" > </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="/questionGroup/all" title="List of all your tests" data-toggle="tooltip">All tests</a>
+                <a class="nav-link active" href="/questions/groups/all" title="List of all your tests" data-toggle="tooltip">Questions</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" title="Detailed history of testing" data-toggle="tooltip">History</a>

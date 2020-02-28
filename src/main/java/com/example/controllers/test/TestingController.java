@@ -1,4 +1,4 @@
-package com.example.controllers;
+package com.example.controllers.test;
 
 import com.example.models.test.TestGroup;
 import com.example.models.test.TestStorageProxy;

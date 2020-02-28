@@ -13,8 +13,8 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class IndexController {
 
-    QuestionStorageProxy myTestModel = new QuestionStorageProxy();
-    TestStorageProxy myTestStorageProxy = new TestStorageProxy();
+    QuestionStorageProxy questionsProxy = new QuestionStorageProxy();
+    TestStorageProxy testProxy = new TestStorageProxy();
 
 
     /*
@@ -24,13 +24,13 @@ public class IndexController {
     public String Welcome(HttpSession session, Model model){
 
         // Получаем историю из базы
-        if (!myTestStorageProxy.GetGroupsFromStorage()){
-            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
+        if (!testProxy.GetGroupsFromStorage()){
+            session.setAttribute("errorMessage" , testProxy.getErrorMessage());
             return "redirect:error";
         }
 
         // Добавляем историю работы в модель
-        model.addAttribute("historyHeaders", myTestStorageProxy.getAllTests());
+        model.addAttribute("testGroups", testProxy.getAllTests());
 
         return "index";
     }
@@ -43,13 +43,13 @@ public class IndexController {
     public String CreateTest(HttpSession session, Model model){
 
         // Получаем список тестов из базы
-        if (!myTestModel.getTestsFromStorage()){
-            session.setAttribute("errorMessage" , myTestModel.getErrorMessage());
+        if (!questionsProxy.getGroupsFromStorage()){
+            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
             return "redirect:error";
         }
 
         // Добавляем все тесты в модель
-        model.addAttribute("modelTests", myTestModel.getAllTests());
+        model.addAttribute("modelTests", questionsProxy.getAllTests());
 
         return "createTest";
     }
@@ -64,9 +64,9 @@ public class IndexController {
                                  String txtQuestionsList){
 
         // Сохраняем список в базе
-        int newHeader = myTestStorageProxy.CreateGroup(txtHeader, txtQuestionsList);
+        int newHeader = testProxy.CreateGroup(txtHeader, txtQuestionsList);
         if (newHeader== -1){
-            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
+            session.setAttribute("errorMessage" , testProxy.getErrorMessage());
             return "redirect:error";
         }
 
@@ -81,8 +81,8 @@ public class IndexController {
     public String DeleteHeader(String headerID, HttpSession session, Model model){
 
         // Удаляем вопрос из базы
-        if (myTestStorageProxy.DeleteTestGroup(Integer.valueOf(headerID)) == false){
-            session.setAttribute("errorMessage" , myTestStorageProxy.getErrorMessage());
+        if (testProxy.DeleteTestGroup(Integer.valueOf(headerID)) == false){
+            session.setAttribute("errorMessage" , testProxy.getErrorMessage());
             return "redirect:error";
         }
 

@@ -37,11 +37,11 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item"><a href="/questionGroup/all">List of all available tests</a></li>
+            <li class="breadcrumb-item"><a href="/questions/groups/all">Groups of questions</a></li>
 
             <li class="breadcrumb-item">
-                <a th:href="@{/questions/index?testID=__${questionGroup.getTestID()}__}"
-                   title="See all questions for questionGroup">[[${questionGroup.getTestHeader()}]]</a>
+                <a th:href="@{/questions/all?groupID=__${questionGroup.getGroupID()}__}"
+                   title="See all questions for questionGroup">[[${questionGroup.getGroupHeader()}]]</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">Edit question No.[[${Question.getQuestionID()}]]</li>
         </ol>
@@ -70,7 +70,7 @@
                             <form method="post"
                                   id="formQHeader"
                                   action="/questions/updateheader"
-                                  th:action="@{'/questions/updateheader?testID=' +  ${Question.getTestID()} +  '&QuestionID=' + ${Question.getQuestionID()}}"
+                                  th:action="@{'/questions/updateheader?QuestionID=' + ${Question.getQuestionID()}}"
                                   class="needs-validation" novalidate>
 
                                 <div class="form-group row">
@@ -131,7 +131,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="answer : ${Question.getTestQuestionAnswers()}" >
+                                            <tr th:each="answer : ${Question.getQuestionAnswers()}" >
                                                 <td>
                                                     <span>[[${answer.getAnswerText()}]]</span>
                                                 </td>
@@ -164,7 +164,7 @@
                                             <tr id="trNoHover">
                                                 <td>
                                                     <form method="post"
-                                                            th:action="@{/questions/addanswer?testID=__${Question.getTestID()}__&questionID=__${Question.getQuestionID()}__}"
+                                                            th:action="@{/questions/addanswer?questionID=__${Question.getQuestionID()}__}"
                                                           id="formNewAnswer" >
                                                         <textarea class="form-control"
                                                                   required
@@ -202,7 +202,7 @@
                             <!--Кнопка сохранения & отмены-->
                             <div class="text-right">
                                 <a class="btn btn-secondary"
-                                   th:href="@{/questions/index?testID=__${questionGroup.getTestID()}__}">Back to list</a>
+                                   th:href="@{/questions/all?groupID=__${questionGroup.getGroupID()}__}">Back to list</a>
                                 &nbsp
                                 <button type="button"
                                         class="btn btn-primary"
@@ -262,7 +262,7 @@
 
                     <form method="get"
                           action="/questions/delete"
-                          th:action="@{'/questions/delete?testID=' + ${Question.getTestID()} +  '&QuestionID=' + ${Question.getQuestionID()}}"
+                          th:action="@{'/questions/delete?QuestionID=' + ${Question.getQuestionID()}}"
                           id="formDeleteQuestion" class="needs-validation" novalidate>
                         <div class="form-group row">
                             <span class="col-md-12 col-form-label">Are you sure about deleting this question?</span>
@@ -270,7 +270,7 @@
                         </div>
                         <div class="text-right">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <a th:href="@{/questions/delete?testID=__${Question.getTestID()}__&QuestionID=__${Question.getQuestionID()}__}"
+                            <a th:href="@{/questions/delete?QuestionID=__${Question.getQuestionID()}__}"
                                class="btn btn-danger" >Yes, delete</a>
                             <!--<button type="submit" class="btn btn-danger">Yes, delete</button>-->
                         </div>
@@ -302,7 +302,7 @@
                             <span class="col-md-12 col-form-label">Are you sure about deleting this answer?</span>
                             <a id="aDeleteAnswerHrefSample"
                                style="display: none"
-                               th:href="@{'/questions/deleteanswer?testID=' + ${Question.getTestID()} +  '&QuestionID=' + ${Question.getQuestionID()}}">A_HREF_SAMPLE</a>
+                               th:href="@{'/questions/deleteanswer?QuestionID=' + ${Question.getQuestionID()}}">A_HREF_SAMPLE</a>
                         </div>
                         <div class="text-right">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

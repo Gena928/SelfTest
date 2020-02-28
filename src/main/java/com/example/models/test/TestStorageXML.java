@@ -349,7 +349,7 @@ public class TestStorageXML implements ITestStorage {
 
         // Getting all groups from storage
         QuestionStorageXML testStorage = new QuestionStorageXML();
-        if (testStorage.getTestsFromStorage() == false) {
+        if (testStorage.getGroupsFromStorage() == false) {
             errorMessage = testStorage.getErrorMessage();
             return null;
         }

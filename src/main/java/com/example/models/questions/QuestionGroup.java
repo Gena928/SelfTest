@@ -11,27 +11,27 @@ import java.util.Date;
 * Testing process is in the History classes
 * */
 public class QuestionGroup {
-    private int testID;
-    private String testHeader;
+    private int groupID;
+    private String groupHeader;
     private int sortField;
     private ArrayList<Question> questions;
     private Date createdDate;
 
 
-    public int getTestID() {
-        return testID;
+    public int getGroupID() {
+        return groupID;
     }
 
-    public void setTestID(int testID) {
-        this.testID = testID;
+    public void setGroupID(int groupID) {
+        this.groupID = groupID;
     }
 
-    public String getTestHeader() {
-        return testHeader;
+    public String getGroupHeader() {
+        return groupHeader;
     }
 
-    public void setTestHeader(String testHeader) {
-        this.testHeader = testHeader;
+    public void setGroupHeader(String groupHeader) {
+        this.groupHeader = groupHeader;
     }
 
     public int getSortField() {

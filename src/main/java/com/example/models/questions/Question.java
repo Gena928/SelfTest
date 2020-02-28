@@ -7,20 +7,12 @@ import java.util.Collections;
 * One question in test (contains multiple answer options)
 * */
 public class Question {
-    private int testID;
     private int questionID;
     private String questionText;
     private boolean isMultiChoice;
     private String answerComment;       // Explanation of correct answer. I.e. why it is correct
     private ArrayList<QuestionAnswer> questionAnswers;
 
-    public int getTestID() {
-        return testID;
-    }
-
-    public void setTestID(int testID) {
-        this.testID = testID;
-    }
 
     public int getQuestionID() {
         return questionID;
@@ -62,7 +54,7 @@ public class Question {
         int len = questionText.length();
         if (len > 50)
             len  = 50;
-        return questionText.substring(0, len);
+        return questionText.substring(0, len) + "...";
     }
 
 

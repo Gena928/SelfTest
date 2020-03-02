@@ -17,8 +17,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class TestStorageXML implements ITestStorage {
      * Creates a group with test in database
      *
      * @groupHeader - header of this group
-     * @listOfTestID - list of test ID's from HTML form (1,3;1,5;1,8;2,10;2,14...)
+     * @listOfTestID - list of Question ID's from HTML form (1,3,10,32,45...)
      * */
     @Override
     public int CreateGroup(String groupHeader, String listOfTestIDs){
@@ -92,15 +91,12 @@ public class TestStorageXML implements ITestStorage {
 
             // List of questions from string into array
             // (each item contains a pair of "QuestionGroup, Question")
-            String[] questionsArray = listOfTestIDs.split(";");
+            String[] questionsArray = listOfTestIDs.split(",");
 
             // Generating test
             for (int i = 0; i<questionsArray.length; i++){
-
-                String[] rec = questionsArray[i].split(",");
                 Test currentTest = new Test();
-                currentTest.setQuestionID(Integer.valueOf(rec[0]));
-                currentTest.setTestID(Integer.valueOf(rec[1]));
+                currentTest.setQuestionID(Integer.valueOf(questionsArray[i]));
                 tests.add(currentTest);
             }
             testGroup.setTests(tests);
@@ -133,7 +129,7 @@ public class TestStorageXML implements ITestStorage {
 
                 Element xmlHistoryRow = doc.createElement("Test");
                 xmlHistoryRow.setAttribute("testGroupID", String.valueOf(testGroup.getGroupID()));
-                xmlHistoryRow.setAttribute("testID", String.valueOf(test.getTestID()));
+                // xmlHistoryRow.setAttribute("testID", String.valueOf(test.getTestID()));
                 xmlHistoryRow.setAttribute("questionID", String.valueOf(test.getQuestionID()));
                 xmlHistoryRow.setAttribute("questionAnswered", String.valueOf(test.isQuestionAnswered()));
                 xmlHistoryRow.setAttribute("answerResult", String.valueOf(test.isAnswerResult()));
@@ -160,6 +156,50 @@ public class TestStorageXML implements ITestStorage {
         }
 
         return testGroup.getGroupID();
+    }
+
+
+    /*
+     * Updates header of the group
+     *
+     * @groupID - id of the group
+     * @groupHeader - new header of the group
+     * */
+    @Override
+    public boolean UpdateGroup(int groupID, String groupHeader){
+
+        try {
+            Document doc = getXMLDocument(historyFileName);
+
+            NodeList nodeList = doc.getElementsByTagName("TestGroup");
+            for (int i = 0; i<nodeList.getLength(); i++){
+
+                Node xmlTestGroup = nodeList.item(i);
+
+                int id = Integer.parseInt(xmlTestGroup
+                        .getAttributes()
+                        .getNamedItem("id")
+                        .getNodeValue());
+
+                // Continue to next record in case of wrong ID
+                if (id != groupID)
+                    continue;
+
+                // Otherwise updating the group header
+                Node gHeader = ((Element)xmlTestGroup).getElementsByTagName("header").item(0);
+                gHeader.setTextContent(stringToBytes(groupHeader));
+            }
+
+            // Save document back to XML file
+            saveXMLDocument(historyFileName, doc);
+
+        }
+        catch (Exception e){
+            errorMessage = "Can't read XML file from disk: " + e.getMessage();
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -192,26 +232,26 @@ public class TestStorageXML implements ITestStorage {
                 String dateInString = xmlTestGroup.getAttributes().getNamedItem("CreatedDate").getNodeValue();
                 testGroup.setCreatedDate(DateFromString_ddMMyyyy(dateInString));
 
-                String hText = ((Element)xmlTestGroup).getElementsByTagName("text").item(0)
+                String hText = ((Element)xmlTestGroup).getElementsByTagName("header").item(0)
                         .getTextContent();
                 hText = BytesToString(hText);
                 testGroup.setHeaderText(hText);
 
                 // Tests inside TestGroup
                 ArrayList<Test> listOfTests = new ArrayList<>();
-                NodeList xmlQuestions = ((Element)xmlTestGroup).getElementsByTagName("row");
+                NodeList xmlQuestions = ((Element)xmlTestGroup).getElementsByTagName("Test");
                 for (int q = 0; q<xmlQuestions.getLength(); q++) {
 
                     Test test = new Test();
                     Node xmlCurrentQuestion = xmlQuestions.item(q);
                     test.setTestGroupID(testGroup.getGroupID());
 
-                    int tID = Integer.parseInt(
+/*                    int tID = Integer.parseInt(
                             xmlCurrentQuestion
                                     .getAttributes()
                                     .getNamedItem("testID")
                                     .getNodeValue());
-                    test.setTestID(tID);
+                    test.setTestID(tID);*/
 
                     int qID = Integer.parseInt(
                             xmlCurrentQuestion
@@ -278,7 +318,7 @@ public class TestStorageXML implements ITestStorage {
                     continue;
 
                 // Otherwise clearing test results
-                NodeList xmlQuestions = ((Element)xmlTestGroup).getElementsByTagName("row");
+                NodeList xmlQuestions = ((Element)xmlTestGroup).getElementsByTagName("Test");
                 for (int q = 0; q<xmlQuestions.getLength(); q++) {
 
                     Node xmlCurrentQuestion = xmlQuestions.item(q);
@@ -379,7 +419,7 @@ public class TestStorageXML implements ITestStorage {
 
 
     /*
-     * Marks a test "answered"
+     * Marks a question "answered"
      *
      * @answerResult - True/False (correct/incorrect)
      * @headerID - id of the test
@@ -387,7 +427,7 @@ public class TestStorageXML implements ITestStorage {
      * @questionID - questionID
      * */
     @Override
-    public boolean MakeTestAnswered(boolean answerResult, int headerID, int testID, int questionID){
+    public boolean MakeQuestionAnswered(boolean answerResult, int groupID, int questionID){
 
         try {
             Document doc = getXMLDocument(historyFileName);
@@ -403,20 +443,13 @@ public class TestStorageXML implements ITestStorage {
                         .getNodeValue());
 
                 // Go to next item in case this is NOT what we are looking
-                if (id != headerID)
+                if (id != groupID)
                     continue;
 
                 NodeList xmlQuestions = ((Element)xmlTestGroup).getElementsByTagName("Test");
                 for (int q = 0; q<xmlQuestions.getLength(); q++) {
 
                     Node xmlCurrentTest = xmlQuestions.item(q);
-
-                    int tID = Integer.parseInt(
-                            xmlCurrentTest
-                                    .getAttributes()
-                                    .getNamedItem("testID")
-                                    .getNodeValue()
-                    );
 
                     int qID = Integer.parseInt(
                             xmlCurrentTest
@@ -425,7 +458,7 @@ public class TestStorageXML implements ITestStorage {
                             .getNodeValue()
                     );
 
-                    if (qID == questionID && tID == testID){
+                    if (qID == questionID){
                         Node questionAnswered = xmlCurrentTest.getAttributes().getNamedItem("questionAnswered");
                         questionAnswered.setTextContent("true");
 
@@ -475,8 +508,11 @@ public class TestStorageXML implements ITestStorage {
                     xmlCurrentHeader.getParentNode().removeChild(xmlCurrentHeader);
             }
 
-            // Saving document
+            // Save document
             saveXMLDocument(historyFileName, doc);
+
+            // Remove empty lines from XML doc
+            QuestionStorageXML.RemoveNewLines(historyFileName);
         }
         catch (Exception e){
             errorMessage = "Can't read XML file from disk: " + e.getMessage();
@@ -492,6 +528,7 @@ public class TestStorageXML implements ITestStorage {
      *
      * @fileName name of the file with XML
      * */
+
     private Document getXMLDocument(String fileName) throws Exception{
 
         // InputStreamReader inputStreamReader = new InputStreamReader(System.in, "UTF-8");

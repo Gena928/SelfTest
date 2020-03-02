@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit selected group</title>
+
+    <!--CoreUI css (Bootstrap) and Font Awesome-->
+    <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
+
+</head>
+<body class="app">
+
+    <!--Main navbar-->
+    <div th:replace="fragments/HeaderFooter :: appHeader"/>
+
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index">Main</a></li>
+            <li class="breadcrumb-item"><a href="/questions/index">Groups of questions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit group test header</li>
+        </ol>
+    </nav>
+
+
+    <div class="app-body">
+        <main class="main">
+            <div class="container-fluid" >
+                <div class="row justify-content-center">
+                    <div class="card col-md-10" >
+                        <div class="card-body">
+
+                            <h2>Edit group header</h2>
+                            <hr>
+
+                            <form method="post"
+                                  action="/questions/groups/edit"
+                                  id="formEditTest"
+                                  class="needs-validation" novalidate >
+
+                                <div class="form-group row">
+                                    <label for="groupID" class="col-sm-2 col-form-label">ID:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" readonly
+                                               class="form-control-plaintext"
+                                               id="groupID"
+                                               name="groupID"
+                                               th:value="${questionGroup.getGroupID()}" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="createdDate" class="col-sm-2 col-form-label">Created date:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" readonly
+                                               class="form-control-plaintext"
+                                               id="createdDate"
+                                               name="createdDate"
+                                               th:value="${questionGroup.getCreatedDate_ddMMyyyy()}" />
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group row" >
+                                    <label for="groupHeader" class="col-sm-2 col-form-label">Header</label>
+                                    <div class="col-sm-5">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="groupHeader"
+                                               name="groupHeader"
+                                               th:value="${questionGroup.getGroupHeader()}"
+                                               placeholder="Only latin letters and numbers!"
+                                               required minlength="5" maxlength="100"/>
+                                            <div class="invalid-feedback">
+                                                Please provide group name.
+                                            </div>
+                                    </div>
+                                </div>
+
+                                <div class="row text-right float-right">
+                                    <a class="btn btn-secondary"
+                                       href="/test/index"
+                                       role="button">Cancel</a>
+                                    &nbsp; &nbsp;
+                                    <button type="submit"
+                                            id="btnHiddenSubmit"
+                                            class="btn btn-primary" >Save changes</button>
+                                </div>
+
+                            </form>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!--Footer-->
+    <div th:replace="fragments/HeaderFooter :: appFooter"/>
+
+    <!--Javascripts-->
+    <div th:replace="fragments/Javascripts :: appScripts"/>
+
+
+    <!--Submit the form on button click-->
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+
+            // JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                    var forms = document.getElementsByClassName('needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+
+
+        });
+
+
+    </script>
+
+</body>
+</html>

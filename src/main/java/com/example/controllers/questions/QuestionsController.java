@@ -87,7 +87,7 @@ public class QuestionsController {
     public String edit(@RequestParam(required = true, defaultValue = "0", value = "QuestionID") int QuestionID,
                        HttpSession session, Model model){
 
-        // Если там ничего нет по этому ID
+        // In case if there is no such ID in database
         QuestionGroup currentQuestionGroup = questionsProxy.getGroupByQuestionID(QuestionID);
         if (currentQuestionGroup == null) {
             session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
@@ -96,13 +96,16 @@ public class QuestionsController {
 
         model.addAttribute("questionGroup", currentQuestionGroup);
 
-        // Добавляем вопрос в модель
         Question currentQuestion = new Question();
-        if (currentQuestionGroup.GetQuestionByID(QuestionID) != null)
+        if (currentQuestionGroup.GetQuestionByID(QuestionID) != null) {
             currentQuestion = currentQuestionGroup.GetQuestionByID(QuestionID);
+        }
+        else {
+            session.setAttribute("errorMessage" , "Question was not found in database");
+            return "redirect:error";
+        }
 
         model.addAttribute("Question", currentQuestion);
-
         return "questions/edit";
     }
 
@@ -132,26 +135,49 @@ public class QuestionsController {
 
 
     /*
-     * AddAnswer - adding answer to test
+     * AddAnswer - adding answerOption to test
      * */
     @PostMapping(value = {"addanswer"})
-    public String addanswer(@RequestParam(required = true, defaultValue = "0", value="testID") int testID,
-                      @RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
+    public String addanswer(@RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
                       String inputAnswerText, String inputIsCorrect,
                       HttpSession session,
                       RedirectAttributes redirectAttributes){
 
-        // Верный или нет ответ на вопрос
+        // Correct or Incorrect answerOption?
         boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
 
-        // Создаем
         if (!questionsProxy.createAnswer(questionID, inputAnswerText, isCorrect)){
             session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
             return "redirect:error";
         }
 
-        return "redirect:edit?testID=" + testID + "&QuestionID=" + questionID;
+        return "redirect:edit?QuestionID=" + questionID;
     }
+
+
+    /*
+    * Update answer option
+    * */
+    @PostMapping(value = {"updateanswer"})
+    public String updateAnswer(@RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
+                               int answerID,
+                               String inputAnswerText,
+                               String inputIsCorrect,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes){
+
+        // Correct or Incorrect answerOption?
+        boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
+
+        if (!questionsProxy.updateAnswer(answerID, questionID, inputAnswerText, isCorrect)){
+            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
+            return "redirect:error";
+        }
+
+        return "redirect:edit?QuestionID=" + questionID;
+    }
+
+
 
 
     /*
@@ -169,22 +195,20 @@ public class QuestionsController {
             isMultiChoice = false;
 
 
-        // Если там ничего нет по этому ID
+        // If there is no such ID in database...
         QuestionGroup currentQuestionGroup = questionsProxy.getGroupByQuestionID(questionID);
         if (currentQuestionGroup == null)
             return new ResponseEntity<>("test id was not found in database", HttpStatus.BAD_REQUEST);
 
-        // Ищем вопрос в текущем тесте
+        // Current question
         Question currentQuestion = currentQuestionGroup.GetQuestionByID(questionID);
 
         if (currentQuestion == null)
             return new ResponseEntity<>("question id was not found in database", HttpStatus.BAD_REQUEST);
 
-
-        // Обновляем заголовок вопроса в базе
+        // Update
         if (!questionsProxy.updateQuestion(questionID, questionHeader, isMultiChoice,questionAnswer))
             return new ResponseEntity<>(questionsProxy.getErrorMessage(), HttpStatus.BAD_REQUEST);
-
 
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
@@ -199,12 +223,10 @@ public class QuestionsController {
                                @RequestParam(required = true, defaultValue = "0", value = "answerID") int answerID,
                                HttpSession session, Model model){
 
-        // Удаляем ответ из базы
         if (!questionsProxy.deleteAnswer(answerID)){
             session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
             return "redirect:error";
         }
-
 
         return "redirect:edit?testID=" + testID + "&QuestionID=" + QuestionID;
     }

@@ -2,6 +2,7 @@ package com.example.controllers.questions;
 
 import com.example.models.questions.QuestionGroup;
 import com.example.models.questions.QuestionStorageProxy;
+import com.example.models.test.TestGroup;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,4 +88,51 @@ public class GroupsController {
 
         return "redirect:all";
     }
+
+
+
+    /*
+     * Edit test group header - get mapping
+     * */
+    @GetMapping(value = {"edit"})
+    public String edit(@RequestParam(required = true, defaultValue = "0", value="groupID") int groupID,
+                             HttpSession session, Model model){
+
+        // Getting group by it's ID
+        QuestionGroup questionGroup = questionsProxy.getGroupByID(groupID);
+        if (questionGroup == null){
+            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
+            return "redirect:error";
+        }
+
+        model.addAttribute("questionGroup", questionGroup);
+
+        return "/questions/groups/edit";
+    }
+
+
+    /*
+     * Edit test group header - post mapping
+     * */
+    @PostMapping(value = {"edit"})
+    public String edit(String groupHeader, int  groupID, HttpSession session){
+
+        // Getting group by it's ID (need sort field)
+        QuestionGroup questionGroup = questionsProxy.getGroupByID(groupID);
+        if (questionGroup == null){
+            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
+            return "redirect:error";
+        }
+
+        // updating group in database
+        if (!questionsProxy.updateGroup(groupID, groupHeader, questionGroup.getSortField())){
+            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
+            return "redirect:error";
+        }
+
+        return "redirect:all";
+    }
+
+
+
 }

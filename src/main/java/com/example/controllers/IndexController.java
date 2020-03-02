@@ -18,76 +18,22 @@ public class IndexController {
 
 
     /*
-    * Главная страничка
+    * Main page
     * */
     @GetMapping(value={"/", "index", "main", "hello"})
     public String Welcome(HttpSession session, Model model){
 
-        // Получаем историю из базы
+        // Getting groups of tests from database
         if (!testProxy.GetGroupsFromStorage()){
             session.setAttribute("errorMessage" , testProxy.getErrorMessage());
             return "redirect:error";
         }
 
-        // Добавляем историю работы в модель
         model.addAttribute("testGroups", testProxy.getAllTests());
 
         return "index";
     }
 
-
-    /*
-    * Начало тестирования - создаем список вопросов, по которым будем пробегаться
-    * */
-    @GetMapping(value = "createTest")
-    public String CreateTest(HttpSession session, Model model){
-
-        // Получаем список тестов из базы
-        if (!questionsProxy.getGroupsFromStorage()){
-            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
-            return "redirect:error";
-        }
-
-        // Добавляем все тесты в модель
-        model.addAttribute("modelTests", questionsProxy.getAllTests());
-
-        return "createTest";
-    }
-
-
-    /*
-    * Заканчиваем создание списка для тестирования
-    * */
-    @PostMapping(value = "createTest")
-    public String CreateTestPost(HttpSession session, Model model,
-                                 String txtHeader,
-                                 String txtQuestionsList){
-
-        // Сохраняем список в базе
-        int newHeader = testProxy.CreateGroup(txtHeader, txtQuestionsList);
-        if (newHeader== -1){
-            session.setAttribute("errorMessage" , testProxy.getErrorMessage());
-            return "redirect:error";
-        }
-
-        return "redirect:/testing/preview?historyHeaderId=" + newHeader;
-    }
-
-
-    /*
-    * Удаляем заголовок истории из базы
-    * */
-    @PostMapping("delete")
-    public String DeleteHeader(String headerID, HttpSession session, Model model){
-
-        // Удаляем вопрос из базы
-        if (testProxy.DeleteTestGroup(Integer.valueOf(headerID)) == false){
-            session.setAttribute("errorMessage" , testProxy.getErrorMessage());
-            return "redirect:error";
-        }
-
-        return "redirect:index";
-    }
 
 
 

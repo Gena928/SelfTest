@@ -118,6 +118,18 @@ public class QuestionStorageProxy {
     }
 
     /*
+     * Updates a answer text in storage
+     *
+     * @answerID - id of the answer in database
+     * @questionID - id of the question in database
+     * @answerText - new text of the answer
+     * @isCorrect - is this answer correct?
+     * */
+    public boolean updateAnswer(int answerID, int questionID, String answerText, boolean isCorrect){
+        return yourQuestionsStorage.updateAnswer(answerID, questionID, answerText, isCorrect);
+    }
+
+    /*
      * Creates a new answer for question
      *
      * @questionID - id of the question where you need to create the answer

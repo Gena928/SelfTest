@@ -7,7 +7,7 @@ import com.example.models.questions.Question;
 * */
 public class Test {
     private int testGroupID;                // ID of the current test group
-    private int testID;                     // Unique ID of this class
+    // private int testID;                     // Unique ID of this class
     private int questionID;                 // ID of the question
     private boolean questionAnswered;       // True / False (answered / not answered)
     private boolean answerResult;           // True / False (correct / incorrect)
@@ -37,10 +37,6 @@ public class Test {
     public void setQuestionID(int questionID) {
         this.questionID = questionID;
     }
-
-    public int getTestID() {return testID;}
-
-    public void setTestID(int testID) {this.testID = testID;}
 
     public boolean isQuestionAnswered() {
         return questionAnswered;

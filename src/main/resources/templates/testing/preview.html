@@ -13,7 +13,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Preview before start testing</li>
+            <li class="breadcrumb-item"><a href="/test/index">Testing history</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Preview before start</li>
         </ol>
     </nav>
 
@@ -28,16 +29,16 @@
                             <p>Please review questions and click "start" when ready</p>
                             <br>
 
-                            <p th:each="test : ${testGroup.getHistoryRows()}">
+                            <p th:each="test : ${testGroup.getTests()}">
                                 [[${test.getQuestion().getQuestionText()}]]
                             </p>
 
 
                             <div class="text-right">
                                 <a href="/index"
-                                   class="btn btn-secondary">Cancel</a>
+                                   class="btn btn-secondary">Back to list</a>
                                 &nbsp;
-                                <a th:href="${'/testing/clearresults?historyHeaderId=' + testGroup.getHeaderID()}"
+                                <a th:href="${'/testing/clearresults?groupID=' + testGroup.getGroupID()}"
                                    class="btn btn-primary">Start</a>
                             </div>
                         </div>

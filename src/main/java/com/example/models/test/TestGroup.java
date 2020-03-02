@@ -1,5 +1,6 @@
 package com.example.models.test;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -104,6 +105,10 @@ public class TestGroup {
         double ttl = tests.size();
         double correct = GetQuantityCorrectAnswers();
 
+        if (ttl == 0)
+            return 0;
+
+
         return (int)((correct / ttl)*100);
     }
 
@@ -132,6 +137,14 @@ public class TestGroup {
         Test result = rows.get(random.nextInt(rows.size()));
 
         return result;
+    }
+
+    /*
+     * Created date in String dd.MM.yyyy
+     * */
+    public String getCreatedDate_ddMMyyyy(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+        return (createdDate==null) ? "" : formatter.format(createdDate);
     }
 
 }

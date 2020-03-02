@@ -38,10 +38,21 @@ public class TestStorageProxy {
      * Creates a group with test in database
      *
      * @groupHeader - header of this group
-     * @listOfTestID - list of test ID's from HTML form (1,3;1,5;1,8;2,10;2,14...)
+     * @listOfTestID - list of question ID's from HTML form (1,3,5,8...)
      * */
     public int CreateGroup(String groupHeader, String listOfTestID){
         return YourTestStorage.CreateGroup(groupHeader, listOfTestID);
+    }
+
+
+    /*
+     * Updates header of the group
+     *
+     * @groupID - id of the group
+     * @groupHeader - new header of the group
+     * */
+    public boolean UpdateGroup(int groupID, String groupHeader){
+        return YourTestStorage.UpdateGroup(groupID, groupHeader);
     }
 
 
@@ -53,14 +64,20 @@ public class TestStorageProxy {
 
 
     /*
+     * Returns group of tests by groupID
+     *
+     * @groupID id of the header, to be returned
+     * */
+    public TestGroup GetGroupByID(int groupID){return YourTestStorage.GetGroupByID(groupID);}
+
+
+    /*
      * Clears results of tests in one TestGroup (correct/incorrect & Answered/non answered
      * required before you start testing
      *
      * @groupID - id of the header to be cleared
      * */
-    public boolean ClearGroupResults(int groupID){
-        return YourTestStorage.ClearGroupResults(groupID);
-    }
+    public boolean ClearGroupResults(int groupID){return YourTestStorage.ClearGroupResults(groupID);}
 
 
     /*
@@ -83,8 +100,8 @@ public class TestStorageProxy {
      * @testID - testID
      * @questionID - questionID
      * */
-    public boolean MakeTestAnswered(boolean answerResult, int headerID, int testID, int questionID){
-        return YourTestStorage.MakeTestAnswered(answerResult, headerID, testID, questionID);
+    public boolean MakeQuestionAnswered(boolean answerResult, int groupID, int questionID){
+        return YourTestStorage.MakeQuestionAnswered(answerResult, groupID, questionID);
     }
 
 

@@ -39,6 +39,15 @@ public interface ITestStorage {
 
 
     /*
+    * Updates header of the group
+    *
+    * @groupID - id of the group
+    * @groupHeader - new header of the group
+    * */
+    boolean UpdateGroup(int groupID, String groupHeader);
+
+
+    /*
     * Gets list of test groups and their content from storate.
     * Fills local variable allTests
     * */
@@ -73,14 +82,14 @@ public interface ITestStorage {
 
 
     /*
-     * Marks a test "answered"
+     * Marks a question "answered"
      *
      * @answerResult - True/False (correct/incorrect)
      * @headerID - id of the test
      * @testID - testID
      * @questionID - questionID
      * */
-    boolean MakeTestAnswered(boolean answerResult, int testID, int questionGroupID, int questionID);
+    boolean MakeQuestionAnswered(boolean answerResult, int questionGroupID, int questionID);
 
 
     /*

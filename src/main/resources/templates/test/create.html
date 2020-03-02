@@ -32,11 +32,11 @@
 
                         <form method="post"
                               id="formHeader"
-                              action="/createTest"
+                              action="/test/create"
                               class="needs-validation" novalidate>
 
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Please enter header:</label>
+                                <label class="col-sm-2 col-form-label">Please enter test header:</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control"
                                                   id="txtHeader"
@@ -60,30 +60,30 @@
                                 <div class="col-sm-10" style="padding-top: 7px;">
 
                                     <div th:each="questionGroup : ${modelTests}">
-                                        <!--Название теста (ссылочка)-->
+                                        <!--Test name-->
                                         <p >
-                                            <a data-toggle="collapse" th:href="@{'#HeaderNo' + ${questionGroup.getTestID()}}"
-                                               aria-expanded="false" th:aria-controls="@{'HeaderNo' + ${questionGroup.getTestID()}}"
-                                            > &nbsp;[[${questionGroup.getTestHeader()}]]</a>
+                                            <a data-toggle="collapse" th:href="@{'#HeaderNo' + ${questionGroup.getGroupID()}}"
+                                               aria-expanded="false" th:aria-controls="@{'HeaderNo' + ${questionGroup.getGroupID()}}"
+                                            > &nbsp;[[${questionGroup.getGroupHeader()}]]</a>
                                         </p>
 
-                                        <!--Контейнер со списком вопросов-->
-                                        <div class="collapse" th:id="@{'HeaderNo' + ${questionGroup.getTestID()}}" >
+                                        <!--List of questions (container)-->
+                                        <div class="collapse" th:id="@{'HeaderNo' + ${questionGroup.getGroupID()}}" >
                                             <div class="card card-body">
 
-                                                <!--Выбрать все вопросы-->
+                                                <!--Select all questions-->
                                                 <div class="form-check">
-                                                    <input class="form-check-input myAll" type="checkbox" value="" th:id="@{'SelectAll' + ${questionGroup.getTestID()}}">
-                                                    <label class="form-check-label" th:for="@{'SelectAll' + ${questionGroup.getTestID()}}">
+                                                    <input class="form-check-input myAll" type="checkbox" value="" th:id="@{'SelectAll' + ${questionGroup.getGroupID()}}">
+                                                    <label class="form-check-label" th:for="@{'SelectAll' + ${questionGroup.getGroupID()}}">
                                                         All
                                                     </label>
                                                 </div>
 
-                                                <!--Список отдельных вопросов-->
+                                                <!--Other questions in this question group-->
                                                 <div th:each="question : ${questionGroup.getQuestions()}" class="form-check">
                                                     <input class="form-check-input myCheckbox"
                                                            type="checkbox"
-                                                           th:attr="data-qid=${question.getQuestionID()}, data-tid=${question.getTestID()}"
+                                                           th:attr="data-qid=${question.getQuestionID()}"
 
                                                            value="" th:id="@{'question' + ${question.getQuestionID()}}">
                                                     <label class="form-check-label" th:for="@{'question' + ${question.getQuestionID()}}">
@@ -102,7 +102,9 @@
 
                                     <a class="btn btn-secondary" href="index" title="Back to main page">Cancel</a>
                                     &nbsp;
-                                    <button type="submit" class="btn btn-primary" title="Create a new questionGroup and start testing process...">Create questionGroup</button>
+                                    <button type="submit"
+                                            class="btn btn-primary"
+                                            title="Create a new test and start testing">Create test</button>
 
                             </div>
                         </form>
@@ -138,7 +140,7 @@
     $(document).ready(function () {
 
         /*
-        * Пользователь хочет выбрать все вопросы в тесте
+        * User wants to select all questions in test
         * */
         $('.myAll').click(function () {
             var checkboxes = $(this).parent().parent().find(':checkbox');
@@ -147,11 +149,11 @@
 
 
         /*
-        * Отправляем форму на сервер
+        * Sending form to server
         * */
         $('#formHeader').submit(function () {
 
-            // Количество символов в заголовке
+            // Qty of symbols in header
             var test = $('#txtHeader').val();
             if (test.length < 10){
                 $('#invalidHeader').show();
@@ -160,33 +162,29 @@
                 $('#invalidHeader').hide();
             }
 
-            // Бежим по каждому чекбоксу и пишем ID теста и вопроса в специальное поле
+            // Iterate every checkbox and create a string "Key/Key" - QuestionID
+            // Java code on the server will parse this string and insert into database
             var qty = 0;
             var inputText = "";
             $('.myCheckbox:checkbox:checked').each(function () {
 
-
-                if ($(this).data('qid') && $(this).data('tid')){
-                    var testID = $(this).data('tid');
+                if ($(this).data('qid')){
                     var questionID = $(this).data('qid');
-                    inputText = inputText + testID + ',' +  questionID + ';';
+                    inputText = inputText + questionID + ',';
                     qty+= 1;
                 }
             });
 
-            // Если ничего не выбрано!
             if(qty == 0)
-                return showMessage('Please select questions for your questionGroup!');
+                return showMessage('Please select questions for your test!');
             else
                 $('#txtQuestionsList').val(inputText);
 
-
-            // return false;
         });
 
 
         /*
-        * Функция показывает сообщение об ошибке или успехе
+        * An error or success message
         * */
         function showMessage(txtError) {
 
@@ -194,7 +192,7 @@
             $('#divError').fadeIn('fast');
             $('#divError').delay(4000).fadeOut('slow');
 
-            // Скроллим в нижнюю часть документа, чтобы пользователь видел сообщение
+            // Scroll to the bottom of the page, so user will see the form
             $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 
             return false;

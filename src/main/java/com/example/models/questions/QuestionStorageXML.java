@@ -183,7 +183,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
         // Updating XML node
         try {
 
-            NodeList nodeList = doc.getElementsByTagName("QuestionGrop");
+            NodeList nodeList = doc.getElementsByTagName("QuestionGroup");
             for (int i = 0; i<nodeList.getLength(); i++) {
                 Node currentNode = nodeList.item(i);
 
@@ -543,7 +543,55 @@ public class QuestionStorageXML implements IQuestionsStorage {
      * */
     @Override
     public boolean updateAnswer(int answerID, int questionID, String answerText, boolean isCorrect){
-        return false;
+
+        Document doc;
+
+        // Checking strings
+        answerText = answerText.trim();
+        if (answerText.isEmpty()){
+            this.errorMessage = "Answer text can not be empty";
+            return false;
+        }
+
+
+        // Reading file from disk
+        try {
+            doc = getXMLDocument(testFileName);
+        }
+        catch (Exception e){
+            errorMessage = "Can't read XML file from disk: " + e.getMessage();
+            return false;
+        }
+
+        // Updating XML element
+        try {
+
+            NodeList nodeList = doc.getElementsByTagName("Answer");
+            for (int i = 0; i<nodeList.getLength(); i++) {
+                Node currentNode = nodeList.item(i);
+
+                int currElementID = Integer.parseInt(currentNode.getAttributes().getNamedItem("id").getNodeValue());
+                if (currElementID == answerID){
+                    currentNode.setTextContent(stringToBytes(answerText));
+                    Node atrrIsCorrect = currentNode.getAttributes().getNamedItem("IsCorrect");
+                    atrrIsCorrect.setTextContent(String.valueOf(isCorrect));
+                }
+            }
+
+        }catch (Exception e){
+            errorMessage = "Can't update XML node: " + e.getMessage();
+            return false;
+        }
+
+        // Saving XML document back to disk
+        try {
+            saveXMLDocument(testFileName, doc);
+        }catch (Exception e){
+            errorMessage = "Can't write XML file with new test to disk: " + e.getMessage();
+            return false;
+        }
+
+        return true;
     }
 
 

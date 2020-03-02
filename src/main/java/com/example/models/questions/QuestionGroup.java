@@ -18,9 +18,7 @@ public class QuestionGroup {
     private Date createdDate;
 
 
-    public int getGroupID() {
-        return groupID;
-    }
+    public int getGroupID() {return groupID;}
 
     public void setGroupID(int groupID) {
         this.groupID = groupID;

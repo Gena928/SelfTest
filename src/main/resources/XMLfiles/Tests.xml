@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <root>
 
+<TestGroup CreatedDate="02.03.2020" id="1">
+    <header>109 115 32 115 113 108 32 115 97 109 112 108 101 32 113 117 101 115 116 105 111 110 115</header>
+    <Test answerResult="true" questionAnswered="true" questionID="3" testGroupID="1"/>
+    <Test answerResult="true" questionAnswered="true" questionID="4" testGroupID="1"/>
+  </TestGroup>
 </root>

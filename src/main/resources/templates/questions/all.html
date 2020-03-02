@@ -28,6 +28,12 @@
                 <div class="row justify-content-center">
                     <div class="card col-md-10" >
                         <div class="card-body">
+
+                            <h2>All questions of "[[${QuestionGroup.getGroupHeader()}]]" group</h2>
+                            <p>Review, delete, update or create new questions.</p>
+                            <br>
+
+
                             <table class="table table-borderless table-hover"
                                    id="myTableTest">
                                 <thead>
@@ -68,7 +74,7 @@
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 &nbsp;
-                                                <!--Открываем модальное окно для удаления теста-->
+                                                <!-- Modal window for deleting a test -->
                                                 <a href="#"
                                                    data-toggle="modal"
                                                    data-target="#divDeleteQuestion">
@@ -88,7 +94,7 @@
 
                             <hr/>
                             <div class="text-right">
-                                <!-- Открываем модальное окошко для создания нового теста -->
+                                <!-- Button for opeing modal window (creating a new test) -->
                                 <button type="button"
                                         class="btn btn-primary"
                                         data-toggle="modal" data-target="#newQuestionConfirm">
@@ -108,7 +114,7 @@
 
 
 
-    <!-- Модальное окно - подтверждает создание нового вопроса-->
+    <!-- Modal window for creating a new question-->
     <div class="modal fade" id="newQuestionConfirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -132,7 +138,7 @@
     </div>
 
 
-    <!-- Модальное окно для подтверждения удаления вопроса -->
+    <!-- Modal window for deleting a question (confirm) -->
     <div class="modal fade" id="divDeleteQuestion" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

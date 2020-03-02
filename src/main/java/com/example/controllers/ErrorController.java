@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.servlet.http.HttpSession;
 
 /*
-* Необходим чтобы отслеживать ошибки и выводить сообщения о них в браузер
+* Errors in browser
 * */
 @Controller
 public class ErrorController {
@@ -15,7 +15,7 @@ public class ErrorController {
     @GetMapping(value = {"error"})
     public String errorMessage(ModelMap modelMap, HttpSession session){
 
-        // Получаем сообщение об ошибке
+        // Getting error message
         modelMap.addAttribute("errorMessage", session.getAttribute("errorMessage"));
         return "error";
     }

@@ -14,7 +14,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Test [[${testGroup.getHeaderText()}]], &nbsp;question [[${testGroup.GetQuantityAnswerredQuestions() + 1}]] of [[${testGroup.getHistoryRows().size()}]]</li>
+            <li class="breadcrumb-item active" aria-current="page">Test "[[${testGroup.getHeaderText()}]]", &nbsp;question [[${testGroup.GetQuantityAnswerredQuestions() + 1}]] of [[${testGroup.getTests().size()}]]</li>
         </ol>
     </nav>
 
@@ -30,12 +30,13 @@
                                 <p th:utext="${question.getQuestionTextAsTHML()}"></p>
                             </div>
 
+                            <br/>
 
                             <div class="row" id="divAnswerOptions">
 
                                 <form class="form-check"
                                       th:unless="${question.isMultiChoice()}"
-                                      th:action="${'/testing/save?HeaderID=' +  test.getHeaderID() + '&TestID=' + test.getTestID() + '&QuestionID=' + test.getQuestionID()}"
+                                      th:action="${'/testing/save?groupID=' +  currentTest.getTestGroupID() + '&questionID=' + currentTest.getQuestionID()}"
                                       method="post">
                                     <div class="form-check"
                                          th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">
@@ -58,7 +59,7 @@
 
                                 <form class="form-check"
                                       th:if="${question.isMultiChoice()}"
-                                      th:action="${'/testing/save?HeaderID=' +  test.getHeaderID() + '&TestID=' + test.getTestID() + '&QuestionID=' + test.getQuestionID()}"
+                                      th:action="${'/testing/save?HeaderID=' +  currentTest.getTestGroupID() + '&TestID=' + currentTest.getTestID() + '&QuestionID=' + currentTest.getQuestionID()}"
                                       method="post" >
                                     <div class="form-check"
                                          th:each="curQuestion : ${question.getTestQuestionAnswerShuffled()}">
@@ -129,7 +130,7 @@
 
 
             /*
-            * Проверяем ответы
+            * Checking answers
             * */
             $('#inputCheckAnswer').click(function () {
                 $('.myQuestionAnswer').fadeIn();
@@ -147,11 +148,11 @@
                     $(this).attr("disabled", true);
                 });
 
-                // Ставим количество ошибок в текстовое поле
+                // Quantity of errors
                 $('.ErrorsQty').val(errorsQty);
 
 
-                // Прячем эту кнопку и показываем другую
+                // Hide "check answers" button and show "Next" button
                 $(this).hide();
                 $('#inputNextQuestion').show();
             });
@@ -159,7 +160,7 @@
 
 
             /*
-            * Отправляем форму на сервер
+            * Send form to server
             * */
             $('#inputNextQuestion').click(function () {
                 $('.form-check').submit();

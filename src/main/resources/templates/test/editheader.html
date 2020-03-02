@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Edit selected questionGroup</title>
+    <title>Edit selected group</title>
 
     <!--CoreUI css (Bootstrap) and Font Awesome-->
     <div th:replace="fragments/HeaderFooter :: CssStyles"></div>
@@ -17,8 +17,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/index">Main</a></li>
-            <li class="breadcrumb-item"><a href="/questionGroup/all">List of all available tests</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit questionGroup</li>
+            <li class="breadcrumb-item"><a href="/test/index">Testing history</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit group test header</li>
         </ol>
     </nav>
 
@@ -30,22 +30,22 @@
                     <div class="card col-md-10" >
                         <div class="card-body">
 
-                            <h2>Edit questionGroup header</h2>
-                            <hr>
+                            <h2>Edit group header</h2>
+                            <p>Please enter a new header</p>
 
                             <form method="post"
-                                  action="/questionGroup/edit"
+                                  action="/test/editheader/"
                                   id="formEditTest"
                                   class="needs-validation" novalidate >
 
                                 <div class="form-group row">
-                                    <label for="testID" class="col-sm-2 col-form-label">ID:</label>
+                                    <label for="groupID" class="col-sm-2 col-form-label">ID:</label>
                                     <div class="col-sm-10">
                                         <input type="text" readonly
                                                class="form-control-plaintext"
-                                               id="testID"
-                                               name="testID"
-                                               th:value="${questionGroup.getTestID()}" />
+                                               id="groupID"
+                                               name="groupID"
+                                               th:value="${testGroup.getGroupID()}" />
                                     </div>
                                 </div>
 
@@ -56,42 +56,31 @@
                                                class="form-control-plaintext"
                                                id="createdDate"
                                                name="createdDate"
-                                               th:value="${questionGroup.getCreatedDate_ddMMyyyy()}" />
+                                               th:value="${testGroup.getCreatedDate_ddMMyyyy()}" />
                                     </div>
                                 </div>
 
-
-                                <div class="form-group row" hidden>
-                                    <label for="sortID" class="col-sm-2 col-form-label">Created date:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" readonly
-                                               class="form-control-plaintext"
-                                               id="sortID"
-                                               name="sortID"
-                                               th:value="${questionGroup.getSortField()}"/>
-                                    </div>
-                                </div>
 
 
                                 <div class="form-group row" >
-                                    <label for="inputHeader" class="col-sm-2 col-form-label">Header</label>
+                                    <label for="groupHeader" class="col-sm-2 col-form-label">Header</label>
                                     <div class="col-sm-5">
                                         <input type="text"
                                                class="form-control"
-                                               id="inputHeader"
-                                               name="inputHeader"
-                                               th:value="${questionGroup.getTestHeader()}"
+                                               id="groupHeader"
+                                               name="groupHeader"
+                                               th:value="${testGroup.getHeaderText()}"
                                                placeholder="Only latin letters and numbers!"
-                                               required maxlength="100"/>
+                                               required minlength="5" maxlength="100"/>
                                             <div class="invalid-feedback">
-                                                Please provide questionGroup name.
+                                                Please provide group name.
                                             </div>
                                     </div>
                                 </div>
 
                                 <div class="row text-right float-right">
                                     <a class="btn btn-secondary"
-                                       href="/questionGroup/all"
+                                       href="/test/index"
                                        role="button">Cancel</a>
                                     &nbsp; &nbsp;
                                     <button type="submit"

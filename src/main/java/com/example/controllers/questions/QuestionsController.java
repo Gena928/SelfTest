@@ -159,7 +159,8 @@ public class QuestionsController {
     * Update answer option
     * */
     @PostMapping(value = {"updateanswer"})
-    public String updateAnswer(@RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
+    @ResponseBody
+    public ResponseEntity<String> updateAnswer(@RequestParam(required = true, defaultValue = "-5", value = "questionID") int questionID,
                                int answerID,
                                String inputAnswerText,
                                String inputIsCorrect,
@@ -170,11 +171,11 @@ public class QuestionsController {
         boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
 
         if (!questionsProxy.updateAnswer(answerID, questionID, inputAnswerText, isCorrect)){
-            session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
-            return "redirect:error";
+            return new ResponseEntity<>(questionsProxy.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return "redirect:edit?QuestionID=" + questionID;
+
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
 

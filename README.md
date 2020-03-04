@@ -11,7 +11,8 @@ Application features:
 
 Short description
 - "questions" package contains code, related to creating a questions;
-- "test" package contains code, related to testing process - i.e. when you choose a questions for testing and do testing itself.
+- "test" package contains code, related to creating a test and questions;
+- "testing" package contains code, related to testing process itself;
 
 
 

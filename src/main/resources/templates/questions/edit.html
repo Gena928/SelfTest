@@ -143,7 +143,8 @@
                                             <tr th:each="answer : ${Question.getQuestionAnswers()}" >
                                                 <td>
                                                     <form method="post"
-                                                          action="/questions/updateanswer">
+                                                          action="/questions/updateanswer"
+                                                          class="MyUpdateAnswer">
 
                                                         <input type="text" class="col-sm-12 form-control"
                                                                name="inputAnswerText"
@@ -423,6 +424,9 @@
             });
 
 
+
+
+
             /*
             * User wants to delete answer option
             * Need to create URL for deleting
@@ -463,7 +467,6 @@
             });
 
 
-
             /*
             * User clicked "Save" in a row with answer option
             * need to save Correct/Incorrect option for this answer and send form to server
@@ -481,6 +484,29 @@
                 }
 
                 $(formForSubmit).submit();
+            });
+
+
+            /*
+            * Updating answer option
+            * */
+            $('.MyUpdateAnswer').submit(function(e){
+                e.preventDefault();
+
+
+                // Post
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function(data)
+                    {
+                        showMessage(false, "");
+                    },
+                    error: function(jqxhr, textStatus, errorThrown) {
+                        showMessage(true, jqxhr.responseText);      // Success / error message
+                    }
+                });
 
             });
 

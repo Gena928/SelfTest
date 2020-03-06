@@ -66,7 +66,7 @@ public class QuestionsController {
 
         // 4 answer options
         for (int i = 0; i<4; i++){
-            String answerText = "dummy answer No." + String.valueOf(i);
+            String answerText = "dummy answer No." + i;
             Boolean isCorrect = true;
             if (i > 0)
                 isCorrect = false;
@@ -144,7 +144,7 @@ public class QuestionsController {
                       RedirectAttributes redirectAttributes){
 
         // Correct or Incorrect answerOption?
-        boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
+        boolean isCorrect = (inputIsCorrect.equals("1"));
 
         if (!questionsProxy.createAnswer(questionID, inputAnswerText, isCorrect)){
             session.setAttribute("errorMessage" , questionsProxy.getErrorMessage());
@@ -168,7 +168,7 @@ public class QuestionsController {
                                RedirectAttributes redirectAttributes){
 
         // Correct or Incorrect answerOption?
-        boolean isCorrect = (inputIsCorrect.equals("1") ? true : false);
+        boolean isCorrect = (inputIsCorrect.equals("1"));
 
         if (!questionsProxy.updateAnswer(answerID, questionID, inputAnswerText, isCorrect)){
             return new ResponseEntity<>(questionsProxy.getErrorMessage(), HttpStatus.BAD_REQUEST);

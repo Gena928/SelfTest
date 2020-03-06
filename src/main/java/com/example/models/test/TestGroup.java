@@ -69,7 +69,7 @@ public class TestGroup {
     public int GetQuantityUnansweredQuestions(){
         int qty = 0;
         for (int i = 0; i< tests.size(); i++){
-            if (tests.get(i).isQuestionAnswered() == false)
+            if (!tests.get(i).isQuestionAnswered())
                 qty++;
         }
         return qty;
@@ -90,7 +90,7 @@ public class TestGroup {
         int result = 0;
 
         for (int i = 0; i< tests.size(); i++){
-            if (tests.get(i).isAnswerResult() == true)
+            if (tests.get(i).isAnswerResult())
                 result++;
         }
 
@@ -125,7 +125,7 @@ public class TestGroup {
         ArrayList<Test> rows = new ArrayList<>();
         for (int i = 0; i< tests.size(); i++){
             Test currentRow = tests.get(i);
-            if (currentRow.isQuestionAnswered() == false)
+            if (!currentRow.isQuestionAnswered())
                 rows.add(currentRow);
         }
 
@@ -134,9 +134,8 @@ public class TestGroup {
 
         // Случайный вопрос
         Random random = new Random();
-        Test result = rows.get(random.nextInt(rows.size()));
 
-        return result;
+        return rows.get(random.nextInt(rows.size()));
     }
 
     /*

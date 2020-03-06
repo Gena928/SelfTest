@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -354,7 +355,7 @@ public class TestStorageXML implements ITestStorage {
         TestGroup testGroup = null;
 
         // All groups
-        if (GetGroupsFromStorage() == false)
+        if (!GetGroupsFromStorage())
             return null;
 
         // Searching exact item
@@ -389,7 +390,7 @@ public class TestStorageXML implements ITestStorage {
 
         // Getting all groups from storage
         QuestionStorageXML testStorage = new QuestionStorageXML();
-        if (testStorage.getGroupsFromStorage() == false) {
+        if (!testStorage.getGroupsFromStorage()) {
             errorMessage = testStorage.getErrorMessage();
             return null;
         }
@@ -611,9 +612,8 @@ public class TestStorageXML implements ITestStorage {
         //Instantiating the SimpleDateFormat class
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         //Parsing the given String to Date object
-        Date date = formatter.parse(input);
         // System.out.println("Date object value: " + date);
-        return date;
+        return formatter.parse(input);
     }
 
 
@@ -624,7 +624,7 @@ public class TestStorageXML implements ITestStorage {
      * */
     private String stringToBytes(String input) throws UnsupportedEncodingException {
 
-        byte[] bytes = input.getBytes("UTF-8");
+        byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
         String result = "";
         for (int i = 0; i<bytes.length; i++){
             result += bytes[i] + " ";
@@ -646,7 +646,7 @@ public class TestStorageXML implements ITestStorage {
         for (int i = 0; i<strBytes.length; i++)
             bytes[i] = Byte.valueOf(strBytes[i]);
 
-        return new String(bytes, "UTF-8");
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     //</editor-fold>

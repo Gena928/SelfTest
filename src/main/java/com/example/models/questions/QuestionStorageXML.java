@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -73,7 +74,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
     public QuestionGroup getGroupByID(int groupID){
 
         // Get all groups from file
-        if (getGroupsFromStorage() == false)
+        if (!getGroupsFromStorage())
             return null;
 
         for (int i = 0; i< allQuestionGroups.size(); i++){
@@ -94,7 +95,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
     public QuestionGroup getGroupByQuestionID(int questionID){
 
         // Getting all groups from file
-        if (getGroupsFromStorage() == false)
+        if (!getGroupsFromStorage())
             return null;
 
         // Iterating all groups and searching required questionID
@@ -427,7 +428,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
-            String xpathString = "//QuestionGroup[@id=repl" + String.valueOf(groupID) +  "repl]";
+            String xpathString = "//QuestionGroup[@id=repl" + groupID +  "repl]";
             xpathString = xpathString.replaceAll("repl","\"");
 
 
@@ -621,7 +622,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
 
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
-            String xpathString = "//Question[@id=repl" + String.valueOf(questionID) +  "repl]";
+            String xpathString = "//Question[@id=repl" + questionID +  "repl]";
             xpathString = xpathString.replaceAll("repl","\"");
             XPathExpression expr = xpath.compile(xpathString);
             NodeList nl = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
@@ -901,9 +902,8 @@ public class QuestionStorageXML implements IQuestionsStorage {
         //Instantiating the SimpleDateFormat class
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         //Parsing the given String to Date object
-        Date date = formatter.parse(input);
         // System.out.println("Date object value: " + date);
-        return date;
+        return formatter.parse(input);
     }
 
 
@@ -998,7 +998,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
     * */
     private String stringToBytes(String input) throws UnsupportedEncodingException {
 
-        byte[] bytes = input.getBytes("UTF-8");
+        byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
         String result = "";
         for (int i = 0; i<bytes.length; i++){
             result += bytes[i] + " ";
@@ -1020,7 +1020,7 @@ public class QuestionStorageXML implements IQuestionsStorage {
         for (int i = 0; i<strBytes.length; i++)
             bytes[i] = Byte.valueOf(strBytes[i]);
 
-        return new String(bytes, "UTF-8");
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     //</editor-fold>

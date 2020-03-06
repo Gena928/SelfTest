@@ -36,7 +36,7 @@ public class GroupsController {
 
         // Adding to model
         model.addAttribute("questionGroups", questionsProxy.getAllTests());
-        Boolean listHasValues = (questionsProxy.getAllTests().size() > 0) ? true : false;
+        Boolean listHasValues = questionsProxy.getAllTests().size() > 0;
         model.addAttribute("listHasValues", listHasValues);
 
         return "questions/groups/all";

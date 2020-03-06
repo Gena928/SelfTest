@@ -87,7 +87,7 @@ public class TestController {
     @PostMapping("delete")
     public String DeleteHeader(String delGroupID, HttpSession session, Model model){
 
-        if (testStorageProxy.DeleteTestGroup(Integer.valueOf(delGroupID)) == false){
+        if (!testStorageProxy.DeleteTestGroup(Integer.valueOf(delGroupID))){
             session.setAttribute("errorMessage" , testStorageProxy.getErrorMessage());
             return "redirect:error";
         }

@@ -68,7 +68,7 @@ public interface ITestStorage {
     *
     * @groupID id of the header, to be returned
     * */
-    public TestGroup GetGroupByID(int groupID);
+    TestGroup GetGroupByID(int groupID);
 
 
     /*
@@ -97,6 +97,6 @@ public interface ITestStorage {
     *
     * @groupID to be removed
     * */
-    public boolean DeleteTestGroup(int groupID);
+    boolean DeleteTestGroup(int groupID);
 
 }
